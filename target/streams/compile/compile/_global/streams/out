@@ -1,0 +1,7 @@
+[0m[[0m[31merror[0m] [0m[0m/home/zzy/Desktop/riscv/src/main/scala/mycore/dpath.scala:233:26: illegal character '\uff0c'[0m
+[0m[[0m[31merror[0m] [0m[0m  /dpath模块请求写data到memory中，请求地址为alu_out，写的数据为无符号的rs2_data[0m
+[0m[[0m[31merror[0m] [0m[0m                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/zzy/Desktop/riscv/src/main/scala/mycore/dpath.scala:233:39: illegal character '\uff0c'[0m
+[0m[[0m[31merror[0m] [0m[0m  /dpath模块请求写data到memory中，请求地址为alu_out，写的数据为无符号的rs2_data[0m
+[0m[[0m[31merror[0m] [0m[0m                                      ^[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
