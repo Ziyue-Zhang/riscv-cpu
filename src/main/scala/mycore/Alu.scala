@@ -14,7 +14,7 @@ class alu extends Module{
     })
 
     val (src1, src2) = (io.src1, io.src2)
-    val shamt = io.src2(4,0).asUInt()
+    val shamt = io.src2(5,0).asUInt()
 
     io.res := MuxCase(0.U, Array(
         (io.op === ALU_ADD)  -> (src1 + src2).asUInt(),

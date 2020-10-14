@@ -1,0 +1,62 @@
+
+/home/zzy/Desktop/ics2019/nexus-am/tests/cputest/build/sum-riscv32-nemu.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80100000 <_start>:
+80100000:	00000413          	li	s0,0
+80100004:	00009117          	auipc	sp,0x9
+80100008:	ffc10113          	addi	sp,sp,-4 # 80109000 <_end>
+8010000c:	078000ef          	jal	ra,80100084 <_trm_init>
+
+80100010 <nemu_assert>:
+80100010:	00050463          	beqz	a0,80100018 <nemu_assert+0x8>
+80100014:	00008067          	ret
+80100018:	ff010113          	addi	sp,sp,-16
+8010001c:	00100513          	li	a0,1
+80100020:	00112623          	sw	ra,12(sp)
+80100024:	054000ef          	jal	ra,80100078 <_halt>
+
+Disassembly of section .text.startup:
+
+80100028 <main>:
+80100028:	fe010113          	addi	sp,sp,-32
+8010002c:	00112e23          	sw	ra,28(sp)
+80100030:	00012623          	sw	zero,12(sp)
+80100034:	00100793          	li	a5,1
+80100038:	06500693          	li	a3,101
+8010003c:	00c12703          	lw	a4,12(sp)
+80100040:	00f70733          	add	a4,a4,a5
+80100044:	00e12623          	sw	a4,12(sp)
+80100048:	00178793          	addi	a5,a5,1
+8010004c:	fed798e3          	bne	a5,a3,8010003c <main+0x14>
+80100050:	00c12503          	lw	a0,12(sp)
+80100054:	fffff7b7          	lui	a5,0xfffff
+80100058:	c4678793          	addi	a5,a5,-954 # ffffec46 <_heap_end+0x77ffec46>
+8010005c:	00f50533          	add	a0,a0,a5
+80100060:	00153513          	seqz	a0,a0
+80100064:	fadff0ef          	jal	ra,80100010 <nemu_assert>
+80100068:	01c12083          	lw	ra,28(sp)
+8010006c:	00000513          	li	a0,0
+80100070:	02010113          	addi	sp,sp,32
+80100074:	00008067          	ret
+
+Disassembly of section .text._halt:
+
+80100078 <_halt>:
+80100078:	00050513          	mv	a0,a0
+8010007c:	0000006b          	0x6b
+80100080:	0000006f          	j	80100080 <_halt+0x8>
+
+Disassembly of section .text._trm_init:
+
+80100084 <_trm_init>:
+80100084:	80000537          	lui	a0,0x80000
+80100088:	ff010113          	addi	sp,sp,-16
+8010008c:	00050513          	mv	a0,a0
+80100090:	00112623          	sw	ra,12(sp)
+80100094:	f95ff0ef          	jal	ra,80100028 <_etext>
+80100098:	00050513          	mv	a0,a0
+8010009c:	0000006b          	0x6b
+801000a0:	0000006f          	j	801000a0 <_trm_init+0x1c>

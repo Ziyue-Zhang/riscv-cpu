@@ -10,7 +10,7 @@ object constant extends RiscvConstants
 
 trait RiscvConstants
 {
-  val XLEN    = 32
+  val XLEN    = 64
   val WIDE    = log2Ceil(XLEN)
   val NUM_REG = 32
 
@@ -28,38 +28,16 @@ trait RiscvConstants
 
   val BUBBLE = 0X4033.U(64.W)
 
-  val ALU_ADD    = 0.asUInt(4.W)
-  val ALU_SUB    = 1.asUInt(4.W)
-  val ALU_AND    = 2.asUInt(4.W)
-  val ALU_OR     = 3.asUInt(4.W)
-  val ALU_XOR    = 4.asUInt(4.W)
-  val ALU_SLT    = 5.asUInt(4.W)
-  val ALU_SLTU   = 6.asUInt(4.W)
-  val ALU_SLL    = 7.asUInt(4.W)
-  val ALU_SRA    = 8.asUInt(4.W)
-  val ALU_SRL    = 9.asUInt(4.W)
-  val ALU_COPY_1 = 10.asUInt(4.W)
-  val ALU_COPY_2 = 11.asUInt(4.W)
-  val ALU_X      = 0.asUInt(4.W)
-
   //定义Y为true的布尔量，N为false的布尔量
   val Y      = true.B
   val N      = false.B
 
   val START_ADDR = "h80000000".U
 
-  //PC的选择信号
-  //PC_4  		---  	PC+4 			--- 位宽为3bits的信号，0值
-  //PC_BR 		---  分支目标 			--- 位宽为3bits的信号，1值
-  //PC_J  		---  跳转目标 			--- 位宽为3bits的信号，2值
-  //PC_JR 		---  跳转寄存器目标 		--- 位宽为3bits的信号，3值
-  //PC_EXC 	---  异常 				--- 位宽为3bits的信号，4值
-  // PC Select Signal
-  val PC_4   = 0.asUInt(3.W)  // PC + 4
-  val PC_BR  = 1.asUInt(3.W)  // branch_target
-  val PC_J   = 2.asUInt(3.W)  // jump_target
-  val PC_JR  = 3.asUInt(3.W)  // jump_reg_target
-  val PC_EXC = 4.asUInt(3.W)  // exception
+  val PC_4   = 0.asUInt(2.W)  // PC + 4
+  val PC_BRJMP  = 1.asUInt(2.W)  // brjmp_target
+  val PC_JALR  = 2.asUInt(2.W)  // jump_reg_target
+  val PC_EXC = 3.asUInt(2.W)  // exception
   
   //分支类型
   //BR_N	---	下一个PC				---	位宽为4bits的信号，0值
@@ -82,80 +60,68 @@ trait RiscvConstants
   val BR_J   = 7.asUInt(4.W)  // Jump
   val BR_JR  = 8.asUInt(4.W)  // Jump Register
 
-  //rs1寄存器操作选择信号
-  //OP1_RS1	---	rs1寄存器						---	位宽为2bits的信号，0值
-  //OP1_IMU	---	立即数，U-type					---	位宽为2bits的信号，1值
-  //OP1_IMZ	---	rs1的零扩展字段，用于CSRI指令		---	位宽为2bits的信号，2值
-  //OP1_X		---	rs1寄存器						---	位宽为2bits的信号，0值
   // RS1 Operand Select Signal
-  val OP1_RS1 = 0.asUInt(2.W) // Register Source #1
-  val OP1_IMU = 1.asUInt(2.W) // immediate, U-type
-  val OP1_IMZ = 2.asUInt(2.W) // Zero-extended rs1 field of inst, for CSRI instructions
-  val OP1_X   = 0.asUInt(2.W)
-  
-  //rs2寄存器操作选择信号
-  //OP2_RS2	---	rs2寄存器						---	位宽为2bits的信号，0值
-  //OP2_IMI	---	立即数，I-type					---	位宽为2bits的信号，1值
-  //OP2_IMS	---	立即数，S-type					---	位宽为2bits的信号，2值
-  //OP2_PC		---	PC								---	位宽为2bits的信号，3值
-  //OP2_X		---	rs2寄存器						---	位宽为2bits的信号，0值
-  // RS2 Operand Select Signal
-  val OP2_RS2 = 0.asUInt(2.W) // Register Source #2
-  val OP2_IMI = 1.asUInt(2.W) // immediate, I-type
-  val OP2_IMS = 2.asUInt(2.W) // immediate, S-type
-  val OP2_PC  = 3.asUInt(2.W) // PC
-  val OP2_X   = 0.asUInt(2.W)
-  
-  //寄存器文件写使能信号
-  //REN_0	---	flase，不使能						---	位宽为1bit的信号，false值
-  //REN_1	---	true，使能							---	位宽为1bit的信号，true值
-  //REN_X	---	flase，不使能						---	位宽为1bit的信号，false值
-  // Register File Write Enable Signal
-  val REN_0   = false.B
-  val REN_1   = true.B
-  val REN_X   = false.B
-  
-  //回写选择信号
-  //WB_ALU	---	回写ALU						---	位宽为2bits的信号，0值
-  //WB_MEM	---	回写memory					---	位宽为2bits的信号，1值
-  //WB_PC4	---	回写PC						---	位宽为2bits的信号，2值
-  //WB_CSR	---	回写CSR寄存器				---	位宽为2bits的信号，3值
-  //WB_X	---	不操作						---	位宽为2bits的信号，0值
-  // Writeback Select Signal
-  val WB_ALU  = 0.asUInt(2.W)
-  val WB_MEM  = 1.asUInt(2.W)
-  val WB_PC4  = 2.asUInt(2.W)
-  val WB_CSR  = 3.asUInt(2.W)
-  val WB_X    = 0.asUInt(2.W)
+   val OP1_RS1   = 0.asUInt(2.W) // Register Source #1
+   val OP1_PC    = 1.asUInt(2.W) // PC
+   val OP1_IMZ   = 2.asUInt(2.W) // Zero-extended Immediate from RS1 field, for use by CSRI instructions
+   val OP1_X     = 0.asUInt(2.W)
 
-  // Memory Write Signal
-  val MWR_0   = false.B
-  val MWR_1   = true.B
-  val MWR_X   = false.B
-  
-  //memory写使能信号
-  //MEN_0	---	flase，不使能						---	位宽为1bit的信号，false值
-  //MEN_1	---	true，使能							---	位宽为1bit的信号，true值
-  //MEN_X	---	flase，不使能						---	位宽为1bit的信号，false值
-  // Memory Enable Signal
-  val MEN_0   = false.B
-  val MEN_1   = true.B
-  val MEN_X   = false.B
-  
-  //memory掩蔽类型信号
-  //MSK_B	---	1字节						---	位宽为3bits的信号，0值
-  //MSK_BU	---	1字节(无符号)			    ---	位宽为3bits的信号，1值
-  //MSK_H	---	half-word(半字)				---	位宽为3bits的信号，2值
-  //MSK_HU	---	half-word(半字)				---	位宽为3bits的信号，3值
-  //MSK_W	---	word(4字节)					---	位宽为3bits的信号，4值
-  //MSK_X	---	word(4字节)					---	位宽为3bits的信号，4值
-  // Memory Mask Type Signal
-  val MSK_B   = 0.asUInt(3.W)
-  val MSK_BU  = 1.asUInt(3.W)
-  val MSK_H   = 2.asUInt(3.W)
-  val MSK_HU  = 3.asUInt(3.W)
-  val MSK_W   = 4.asUInt(3.W)
-  val MSK_X   = 4.asUInt(3.W)
+   // RS2 Operand Select Signal
+   val OP2_RS2    = 0.asUInt(3.W) // Register Source #2
+   val OP2_ITYPE  = 1.asUInt(3.W) // immediate, I-type
+   val OP2_STYPE  = 2.asUInt(3.W) // immediate, S-type
+   val OP2_SBTYPE = 3.asUInt(3.W) // immediate, B
+   val OP2_UTYPE  = 4.asUInt(3.W) // immediate, U-type
+   val OP2_UJTYPE = 5.asUInt(3.W) // immediate, J-type
+   val OP2_X      = 0.asUInt(3.W)
+
+   // Register Operand Output Enable Signal
+   val OEN_0   = false.B
+   val OEN_1   = true.B
+
+   // Register File Write Enable Signal
+   val REN_0   = false.B
+   val REN_1   = true.B
+
+   // ALU Operation Signal
+   val ALU_ADD    = 0.asUInt(4.W)
+   val ALU_SUB    = 1.asUInt(4.W)
+   val ALU_SLL    = 2.asUInt(4.W)
+   val ALU_SRL    = 3.asUInt(4.W)
+   val ALU_SRA    = 4.asUInt(4.W)
+   val ALU_AND    = 5.asUInt(4.W)
+   val ALU_OR     = 6.asUInt(4.W)
+   val ALU_XOR    = 7.asUInt(4.W)
+   val ALU_SLT    = 8.asUInt(4.W)
+   val ALU_SLTU   = 9.asUInt(4.W)
+   val ALU_COPY_1 = 10.asUInt(4.W)
+   val ALU_COPY_2 = 11.asUInt(4.W)
+   val ALU_X      = 0.asUInt(4.W)
+
+   // Writeback Select Signal
+   val WB_ALU  = 0.asUInt(2.W)
+   val WB_MEM  = 1.asUInt(2.W)
+   val WB_PC4  = 2.asUInt(2.W)
+   val WB_CSR  = 3.asUInt(2.W)
+   val WB_X    = 0.asUInt(2.W)
+
+   // Memory Write Signal
+   val MWR_0   = false.B
+   val MWR_1   = true.B
+   val MWR_X   = false.B
+
+   // Memory Enable Signal
+   val MEN_0   = false.B
+   val MEN_1   = true.B
+   val MEN_X   = false.B
+
+   // Memory Mask Type Signal
+   val MSK_B   = 0.asUInt(3.W)
+   val MSK_BU  = 1.asUInt(3.W)
+   val MSK_H   = 2.asUInt(3.W)
+   val MSK_HU  = 3.asUInt(3.W)
+   val MSK_W   = 4.asUInt(3.W)
+   val MSK_X   = 4.asUInt(3.W)
 
   //cache flush操作，同步
   //M_N		---	不操作						---	位宽为3bits的信号，0值

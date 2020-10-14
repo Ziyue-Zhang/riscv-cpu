@@ -1,0 +1,99 @@
+
+/home/zzy/Desktop/ics2019/nexus-am/tests/cputest/build/shuixianhua-riscv32-nemu.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80100000 <_start>:
+80100000:	00000413          	li	s0,0
+80100004:	00009117          	auipc	sp,0x9
+80100008:	ffc10113          	addi	sp,sp,-4 # 80109000 <_end>
+8010000c:	104000ef          	jal	ra,80100110 <_trm_init>
+
+80100010 <nemu_assert>:
+80100010:	00050463          	beqz	a0,80100018 <nemu_assert+0x8>
+80100014:	00008067          	ret
+80100018:	ff010113          	addi	sp,sp,-16
+8010001c:	00100513          	li	a0,1
+80100020:	00112623          	sw	ra,12(sp)
+80100024:	0e0000ef          	jal	ra,80100104 <_halt>
+
+80100028 <cube>:
+80100028:	02a507b3          	mul	a5,a0,a0
+8010002c:	02a78533          	mul	a0,a5,a0
+80100030:	00008067          	ret
+
+Disassembly of section .text.startup:
+
+80100034 <main>:
+80100034:	fe010113          	addi	sp,sp,-32
+80100038:	00912a23          	sw	s1,20(sp)
+8010003c:	801004b7          	lui	s1,0x80100
+80100040:	00812c23          	sw	s0,24(sp)
+80100044:	01212823          	sw	s2,16(sp)
+80100048:	01312623          	sw	s3,12(sp)
+8010004c:	01412423          	sw	s4,8(sp)
+80100050:	01512223          	sw	s5,4(sp)
+80100054:	00112e23          	sw	ra,28(sp)
+80100058:	06400413          	li	s0,100
+8010005c:	00000a93          	li	s5,0
+80100060:	1f400993          	li	s3,500
+80100064:	06400a13          	li	s4,100
+80100068:	00a00913          	li	s2,10
+8010006c:	13048493          	addi	s1,s1,304 # 80100130 <_heap_end+0xf8100130>
+80100070:	00140413          	addi	s0,s0,1
+80100074:	05340e63          	beq	s0,s3,801000d0 <main+0x9c>
+80100078:	032447b3          	div	a5,s0,s2
+8010007c:	03444633          	div	a2,s0,s4
+80100080:	0327e7b3          	rem	a5,a5,s2
+80100084:	032466b3          	rem	a3,s0,s2
+80100088:	02f78733          	mul	a4,a5,a5
+8010008c:	02c60533          	mul	a0,a2,a2
+80100090:	02d685b3          	mul	a1,a3,a3
+80100094:	02f707b3          	mul	a5,a4,a5
+80100098:	02c50633          	mul	a2,a0,a2
+8010009c:	02d586b3          	mul	a3,a1,a3
+801000a0:	00c787b3          	add	a5,a5,a2
+801000a4:	00d787b3          	add	a5,a5,a3
+801000a8:	fc8794e3          	bne	a5,s0,80100070 <main+0x3c>
+801000ac:	002a9793          	slli	a5,s5,0x2
+801000b0:	00f487b3          	add	a5,s1,a5
+801000b4:	0007a503          	lw	a0,0(a5)
+801000b8:	001a8a93          	addi	s5,s5,1
+801000bc:	40850533          	sub	a0,a0,s0
+801000c0:	00153513          	seqz	a0,a0
+801000c4:	00140413          	addi	s0,s0,1
+801000c8:	f49ff0ef          	jal	ra,80100010 <nemu_assert>
+801000cc:	fb3416e3          	bne	s0,s3,80100078 <main+0x44>
+801000d0:	ffca8513          	addi	a0,s5,-4
+801000d4:	00153513          	seqz	a0,a0
+801000d8:	f39ff0ef          	jal	ra,80100010 <nemu_assert>
+801000dc:	01c12083          	lw	ra,28(sp)
+801000e0:	01812403          	lw	s0,24(sp)
+801000e4:	01412483          	lw	s1,20(sp)
+801000e8:	01012903          	lw	s2,16(sp)
+801000ec:	00c12983          	lw	s3,12(sp)
+801000f0:	00812a03          	lw	s4,8(sp)
+801000f4:	00412a83          	lw	s5,4(sp)
+801000f8:	00000513          	li	a0,0
+801000fc:	02010113          	addi	sp,sp,32
+80100100:	00008067          	ret
+
+Disassembly of section .text._halt:
+
+80100104 <_halt>:
+80100104:	00050513          	mv	a0,a0
+80100108:	0000006b          	0x6b
+8010010c:	0000006f          	j	8010010c <_halt+0x8>
+
+Disassembly of section .text._trm_init:
+
+80100110 <_trm_init>:
+80100110:	80000537          	lui	a0,0x80000
+80100114:	ff010113          	addi	sp,sp,-16
+80100118:	00050513          	mv	a0,a0
+8010011c:	00112623          	sw	ra,12(sp)
+80100120:	f15ff0ef          	jal	ra,80100034 <_etext>
+80100124:	00050513          	mv	a0,a0
+80100128:	0000006b          	0x6b
+8010012c:	0000006f          	j	8010012c <_trm_init+0x1c>

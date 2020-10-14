@@ -1,0 +1,164 @@
+
+/home/zzy/Desktop/ics2019/nexus-am/tests/cputest/build/bit-riscv32-nemu.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80100000 <_start>:
+80100000:	00000413          	li	s0,0
+80100004:	00009117          	auipc	sp,0x9
+80100008:	ffc10113          	addi	sp,sp,-4 # 80109000 <_end>
+8010000c:	200000ef          	jal	ra,8010020c <_trm_init>
+
+80100010 <nemu_assert>:
+80100010:	00050463          	beqz	a0,80100018 <nemu_assert+0x8>
+80100014:	00008067          	ret
+80100018:	ff010113          	addi	sp,sp,-16
+8010001c:	00100513          	li	a0,1
+80100020:	00112623          	sw	ra,12(sp)
+80100024:	1dc000ef          	jal	ra,80100200 <_halt>
+
+80100028 <getbit>:
+80100028:	4035d793          	srai	a5,a1,0x3
+8010002c:	00f50533          	add	a0,a0,a5
+80100030:	00054503          	lbu	a0,0(a0)
+80100034:	0075f593          	andi	a1,a1,7
+80100038:	00b55533          	srl	a0,a0,a1
+8010003c:	00157513          	andi	a0,a0,1
+80100040:	00008067          	ret
+
+80100044 <setbit>:
+80100044:	4035d793          	srai	a5,a1,0x3
+80100048:	ff010113          	addi	sp,sp,-16
+8010004c:	00f50533          	add	a0,a0,a5
+80100050:	00a12623          	sw	a0,12(sp)
+80100054:	0075f793          	andi	a5,a1,7
+80100058:	00100593          	li	a1,1
+8010005c:	00f595b3          	sll	a1,a1,a5
+80100060:	00c12783          	lw	a5,12(sp)
+80100064:	02061063          	bnez	a2,80100084 <setbit+0x40>
+80100068:	0007c783          	lbu	a5,0(a5)
+8010006c:	fff5c593          	not	a1,a1
+80100070:	00f5f5b3          	and	a1,a1,a5
+80100074:	00c12783          	lw	a5,12(sp)
+80100078:	00b78023          	sb	a1,0(a5)
+8010007c:	01010113          	addi	sp,sp,16
+80100080:	00008067          	ret
+80100084:	0007c783          	lbu	a5,0(a5)
+80100088:	00f5e5b3          	or	a1,a1,a5
+8010008c:	00c12783          	lw	a5,12(sp)
+80100090:	0ff5f593          	andi	a1,a1,255
+80100094:	00b78023          	sb	a1,0(a5)
+80100098:	01010113          	addi	sp,sp,16
+8010009c:	00008067          	ret
+
+Disassembly of section .text.startup:
+
+801000a0 <main>:
+801000a0:	fe010113          	addi	sp,sp,-32
+801000a4:	0aa00793          	li	a5,170
+801000a8:	00000593          	li	a1,0
+801000ac:	00c10513          	addi	a0,sp,12
+801000b0:	00112e23          	sw	ra,28(sp)
+801000b4:	00f11623          	sh	a5,12(sp)
+801000b8:	f71ff0ef          	jal	ra,80100028 <getbit>
+801000bc:	00153513          	seqz	a0,a0
+801000c0:	f51ff0ef          	jal	ra,80100010 <nemu_assert>
+801000c4:	00100593          	li	a1,1
+801000c8:	00c10513          	addi	a0,sp,12
+801000cc:	f5dff0ef          	jal	ra,80100028 <getbit>
+801000d0:	fff50513          	addi	a0,a0,-1
+801000d4:	00153513          	seqz	a0,a0
+801000d8:	f39ff0ef          	jal	ra,80100010 <nemu_assert>
+801000dc:	00200593          	li	a1,2
+801000e0:	00c10513          	addi	a0,sp,12
+801000e4:	f45ff0ef          	jal	ra,80100028 <getbit>
+801000e8:	00153513          	seqz	a0,a0
+801000ec:	f25ff0ef          	jal	ra,80100010 <nemu_assert>
+801000f0:	00300593          	li	a1,3
+801000f4:	00c10513          	addi	a0,sp,12
+801000f8:	f31ff0ef          	jal	ra,80100028 <getbit>
+801000fc:	fff50513          	addi	a0,a0,-1
+80100100:	00153513          	seqz	a0,a0
+80100104:	f0dff0ef          	jal	ra,80100010 <nemu_assert>
+80100108:	00400593          	li	a1,4
+8010010c:	00c10513          	addi	a0,sp,12
+80100110:	f19ff0ef          	jal	ra,80100028 <getbit>
+80100114:	00153513          	seqz	a0,a0
+80100118:	ef9ff0ef          	jal	ra,80100010 <nemu_assert>
+8010011c:	00500593          	li	a1,5
+80100120:	00c10513          	addi	a0,sp,12
+80100124:	f05ff0ef          	jal	ra,80100028 <getbit>
+80100128:	fff50513          	addi	a0,a0,-1
+8010012c:	00153513          	seqz	a0,a0
+80100130:	ee1ff0ef          	jal	ra,80100010 <nemu_assert>
+80100134:	00600593          	li	a1,6
+80100138:	00c10513          	addi	a0,sp,12
+8010013c:	eedff0ef          	jal	ra,80100028 <getbit>
+80100140:	00153513          	seqz	a0,a0
+80100144:	ecdff0ef          	jal	ra,80100010 <nemu_assert>
+80100148:	00700593          	li	a1,7
+8010014c:	00c10513          	addi	a0,sp,12
+80100150:	ed9ff0ef          	jal	ra,80100028 <getbit>
+80100154:	fff50513          	addi	a0,a0,-1
+80100158:	00153513          	seqz	a0,a0
+8010015c:	eb5ff0ef          	jal	ra,80100010 <nemu_assert>
+80100160:	00c10513          	addi	a0,sp,12
+80100164:	00100613          	li	a2,1
+80100168:	00800593          	li	a1,8
+8010016c:	ed9ff0ef          	jal	ra,80100044 <setbit>
+80100170:	00c10513          	addi	a0,sp,12
+80100174:	00000613          	li	a2,0
+80100178:	00900593          	li	a1,9
+8010017c:	ec9ff0ef          	jal	ra,80100044 <setbit>
+80100180:	00c10513          	addi	a0,sp,12
+80100184:	00100613          	li	a2,1
+80100188:	00a00593          	li	a1,10
+8010018c:	eb9ff0ef          	jal	ra,80100044 <setbit>
+80100190:	00c10513          	addi	a0,sp,12
+80100194:	00000613          	li	a2,0
+80100198:	00b00593          	li	a1,11
+8010019c:	ea9ff0ef          	jal	ra,80100044 <setbit>
+801001a0:	00c10513          	addi	a0,sp,12
+801001a4:	00100613          	li	a2,1
+801001a8:	00c00593          	li	a1,12
+801001ac:	e99ff0ef          	jal	ra,80100044 <setbit>
+801001b0:	00c10513          	addi	a0,sp,12
+801001b4:	00000613          	li	a2,0
+801001b8:	00d00593          	li	a1,13
+801001bc:	e89ff0ef          	jal	ra,80100044 <setbit>
+801001c0:	00c10513          	addi	a0,sp,12
+801001c4:	00100613          	li	a2,1
+801001c8:	00e00593          	li	a1,14
+801001cc:	e79ff0ef          	jal	ra,80100044 <setbit>
+801001d0:	00c10513          	addi	a0,sp,12
+801001d4:	00000613          	li	a2,0
+801001d8:	00f00593          	li	a1,15
+801001dc:	e69ff0ef          	jal	ra,80100044 <setbit>
+801001e0:	00d14503          	lbu	a0,13(sp)
+801001e4:	fab50513          	addi	a0,a0,-85
+801001e8:	00153513          	seqz	a0,a0
+801001ec:	e25ff0ef          	jal	ra,80100010 <nemu_assert>
+801001f0:	01c12083          	lw	ra,28(sp)
+801001f4:	00000513          	li	a0,0
+801001f8:	02010113          	addi	sp,sp,32
+801001fc:	00008067          	ret
+
+Disassembly of section .text._halt:
+
+80100200 <_halt>:
+80100200:	00050513          	mv	a0,a0
+80100204:	0000006b          	0x6b
+80100208:	0000006f          	j	80100208 <_halt+0x8>
+
+Disassembly of section .text._trm_init:
+
+8010020c <_trm_init>:
+8010020c:	80000537          	lui	a0,0x80000
+80100210:	ff010113          	addi	sp,sp,-16
+80100214:	00050513          	mv	a0,a0
+80100218:	00112623          	sw	ra,12(sp)
+8010021c:	e85ff0ef          	jal	ra,801000a0 <_etext>
+80100220:	00050513          	mv	a0,a0
+80100224:	0000006b          	0x6b
+80100228:	0000006f          	j	80100228 <_trm_init+0x1c>

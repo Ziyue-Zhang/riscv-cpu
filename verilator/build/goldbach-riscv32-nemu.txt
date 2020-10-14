@@ -1,0 +1,115 @@
+
+/home/zzy/Desktop/ics2019/nexus-am/tests/cputest/build/goldbach-riscv32-nemu.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80100000 <_start>:
+80100000:	00000413          	li	s0,0
+80100004:	00009117          	auipc	sp,0x9
+80100008:	ffc10113          	addi	sp,sp,-4 # 80109000 <_end>
+8010000c:	13c000ef          	jal	ra,80100148 <_trm_init>
+
+80100010 <nemu_assert>:
+80100010:	00050463          	beqz	a0,80100018 <nemu_assert+0x8>
+80100014:	00008067          	ret
+80100018:	ff010113          	addi	sp,sp,-16
+8010001c:	00100513          	li	a0,1
+80100020:	00112623          	sw	ra,12(sp)
+80100024:	118000ef          	jal	ra,8010013c <_halt>
+
+80100028 <is_prime>:
+80100028:	00100793          	li	a5,1
+8010002c:	00050713          	mv	a4,a0
+80100030:	02a7d663          	ble	a0,a5,8010005c <is_prime+0x34>
+80100034:	00200793          	li	a5,2
+80100038:	02f50663          	beq	a0,a5,80100064 <is_prime+0x3c>
+8010003c:	00157513          	andi	a0,a0,1
+80100040:	00051863          	bnez	a0,80100050 <is_prime+0x28>
+80100044:	01c0006f          	j	80100060 <is_prime+0x38>
+80100048:	02f766b3          	rem	a3,a4,a5
+8010004c:	00068863          	beqz	a3,8010005c <is_prime+0x34>
+80100050:	00178793          	addi	a5,a5,1
+80100054:	fef71ae3          	bne	a4,a5,80100048 <is_prime+0x20>
+80100058:	00008067          	ret
+8010005c:	00000513          	li	a0,0
+80100060:	00008067          	ret
+80100064:	00100513          	li	a0,1
+80100068:	00008067          	ret
+
+8010006c <goldbach>:
+8010006c:	00200713          	li	a4,2
+80100070:	00050593          	mv	a1,a0
+80100074:	00200793          	li	a5,2
+80100078:	00200813          	li	a6,2
+8010007c:	00100893          	li	a7,1
+80100080:	06a75063          	ble	a0,a4,801000e0 <goldbach+0x74>
+80100084:	03078263          	beq	a5,a6,801000a8 <goldbach+0x3c>
+80100088:	0017f713          	andi	a4,a5,1
+8010008c:	04070663          	beqz	a4,801000d8 <goldbach+0x6c>
+80100090:	00200713          	li	a4,2
+80100094:	00c0006f          	j	801000a0 <goldbach+0x34>
+80100098:	02e7e6b3          	rem	a3,a5,a4
+8010009c:	02068e63          	beqz	a3,801000d8 <goldbach+0x6c>
+801000a0:	00170713          	addi	a4,a4,1
+801000a4:	fef71ae3          	bne	a4,a5,80100098 <goldbach+0x2c>
+801000a8:	40f586b3          	sub	a3,a1,a5
+801000ac:	02d8d663          	ble	a3,a7,801000d8 <goldbach+0x6c>
+801000b0:	03068c63          	beq	a3,a6,801000e8 <goldbach+0x7c>
+801000b4:	0016f513          	andi	a0,a3,1
+801000b8:	02050063          	beqz	a0,801000d8 <goldbach+0x6c>
+801000bc:	00200713          	li	a4,2
+801000c0:	00c0006f          	j	801000cc <goldbach+0x60>
+801000c4:	02e6e633          	rem	a2,a3,a4
+801000c8:	00060863          	beqz	a2,801000d8 <goldbach+0x6c>
+801000cc:	00170713          	addi	a4,a4,1
+801000d0:	fed71ae3          	bne	a4,a3,801000c4 <goldbach+0x58>
+801000d4:	00008067          	ret
+801000d8:	00178793          	addi	a5,a5,1
+801000dc:	faf594e3          	bne	a1,a5,80100084 <goldbach+0x18>
+801000e0:	00000513          	li	a0,0
+801000e4:	00008067          	ret
+801000e8:	00100513          	li	a0,1
+801000ec:	00008067          	ret
+
+Disassembly of section .text.startup:
+
+801000f0 <main>:
+801000f0:	ff010113          	addi	sp,sp,-16
+801000f4:	00812423          	sw	s0,8(sp)
+801000f8:	00912223          	sw	s1,4(sp)
+801000fc:	00112623          	sw	ra,12(sp)
+80100100:	00400413          	li	s0,4
+80100104:	02000493          	li	s1,32
+80100108:	00040513          	mv	a0,s0
+8010010c:	f61ff0ef          	jal	ra,8010006c <goldbach>
+80100110:	fff50513          	addi	a0,a0,-1
+80100114:	00240413          	addi	s0,s0,2
+80100118:	00153513          	seqz	a0,a0
+8010011c:	ef5ff0ef          	jal	ra,80100010 <nemu_assert>
+80100120:	fe9414e3          	bne	s0,s1,80100108 <main+0x18>
+80100124:	00c12083          	lw	ra,12(sp)
+80100128:	00812403          	lw	s0,8(sp)
+8010012c:	00412483          	lw	s1,4(sp)
+80100130:	00000513          	li	a0,0
+80100134:	01010113          	addi	sp,sp,16
+80100138:	00008067          	ret
+
+Disassembly of section .text._halt:
+
+8010013c <_halt>:
+8010013c:	00050513          	mv	a0,a0
+80100140:	0000006b          	0x6b
+80100144:	0000006f          	j	80100144 <_halt+0x8>
+
+Disassembly of section .text._trm_init:
+
+80100148 <_trm_init>:
+80100148:	80000537          	lui	a0,0x80000
+8010014c:	ff010113          	addi	sp,sp,-16
+80100150:	00050513          	mv	a0,a0
+80100154:	00112623          	sw	ra,12(sp)
+80100158:	f99ff0ef          	jal	ra,801000f0 <_etext>
+8010015c:	00050513          	mv	a0,a0
+80100160:	0000006b          	0x6b
+80100164:	0000006f          	j	80100164 <_trm_init+0x1c>

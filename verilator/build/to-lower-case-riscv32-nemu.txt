@@ -1,0 +1,85 @@
+
+/home/zzy/Desktop/ics2019/nexus-am/tests/cputest/build/to-lower-case-riscv32-nemu.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80100000 <_start>:
+80100000:	00000413          	li	s0,0
+80100004:	00009117          	auipc	sp,0x9
+80100008:	ffc10113          	addi	sp,sp,-4 # 80109000 <_end>
+8010000c:	0cc000ef          	jal	ra,801000d8 <_trm_init>
+
+80100010 <nemu_assert>:
+80100010:	00050463          	beqz	a0,80100018 <nemu_assert+0x8>
+80100014:	00008067          	ret
+80100018:	ff010113          	addi	sp,sp,-16
+8010001c:	00100513          	li	a0,1
+80100020:	00112623          	sw	ra,12(sp)
+80100024:	0a8000ef          	jal	ra,801000cc <_halt>
+
+80100028 <to_lower_case>:
+80100028:	fbf50793          	addi	a5,a0,-65
+8010002c:	0ff7f793          	andi	a5,a5,255
+80100030:	01900713          	li	a4,25
+80100034:	00f76663          	bltu	a4,a5,80100040 <to_lower_case+0x18>
+80100038:	02050513          	addi	a0,a0,32
+8010003c:	0ff57513          	andi	a0,a0,255
+80100040:	00008067          	ret
+
+Disassembly of section .text.startup:
+
+80100044 <main>:
+80100044:	fe010113          	addi	sp,sp,-32
+80100048:	00912a23          	sw	s1,20(sp)
+8010004c:	801004b7          	lui	s1,0x80100
+80100050:	00812c23          	sw	s0,24(sp)
+80100054:	01212823          	sw	s2,16(sp)
+80100058:	01312623          	sw	s3,12(sp)
+8010005c:	00112e23          	sw	ra,28(sp)
+80100060:	00000413          	li	s0,0
+80100064:	00000513          	li	a0,0
+80100068:	0f848493          	addi	s1,s1,248 # 801000f8 <_heap_end+0xf81000f8>
+8010006c:	08000913          	li	s2,128
+80100070:	01900993          	li	s3,25
+80100074:	008487b3          	add	a5,s1,s0
+80100078:	0007c783          	lbu	a5,0(a5)
+8010007c:	00140413          	addi	s0,s0,1
+80100080:	40a78533          	sub	a0,a5,a0
+80100084:	00153513          	seqz	a0,a0
+80100088:	f89ff0ef          	jal	ra,80100010 <nemu_assert>
+8010008c:	0ff47513          	andi	a0,s0,255
+80100090:	fbf50793          	addi	a5,a0,-65
+80100094:	0ff7f793          	andi	a5,a5,255
+80100098:	02050713          	addi	a4,a0,32
+8010009c:	01240863          	beq	s0,s2,801000ac <main+0x68>
+801000a0:	fcf9eae3          	bltu	s3,a5,80100074 <main+0x30>
+801000a4:	0ff77513          	andi	a0,a4,255
+801000a8:	fcdff06f          	j	80100074 <main+0x30>
+801000ac:	01c12083          	lw	ra,28(sp)
+801000b0:	01812403          	lw	s0,24(sp)
+801000b4:	01412483          	lw	s1,20(sp)
+801000b8:	01012903          	lw	s2,16(sp)
+801000bc:	00c12983          	lw	s3,12(sp)
+801000c0:	00000513          	li	a0,0
+801000c4:	02010113          	addi	sp,sp,32
+801000c8:	00008067          	ret
+
+Disassembly of section .text._halt:
+
+801000cc <_halt>:
+801000cc:	00050513          	mv	a0,a0
+801000d0:	0000006b          	0x6b
+801000d4:	0000006f          	j	801000d4 <_halt+0x8>
+
+Disassembly of section .text._trm_init:
+
+801000d8 <_trm_init>:
+801000d8:	80000537          	lui	a0,0x80000
+801000dc:	ff010113          	addi	sp,sp,-16
+801000e0:	00050513          	mv	a0,a0
+801000e4:	00112623          	sw	ra,12(sp)
+801000e8:	f5dff0ef          	jal	ra,80100044 <_etext>
+801000ec:	00050513          	mv	a0,a0
+801000f0:	0000006b          	0x6b
+801000f4:	0000006f          	j	801000f4 <_trm_init+0x1c>

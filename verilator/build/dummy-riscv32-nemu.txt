@@ -1,0 +1,29 @@
+
+/home/zzy/Desktop/ics2019/nexus-am/tests/cputest/build/dummy-riscv32-nemu.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80100000 <_start>:
+80100000:	00000413          	li	s0,0
+80100004:	00009117          	auipc	sp,0x9
+80100008:	ffc10113          	addi	sp,sp,-4 # 80109000 <_end>
+8010000c:	00c000ef          	jal	ra,80100018 <_trm_init>
+
+Disassembly of section .text.startup:
+
+80100010 <main>:
+80100010:	00000513          	li	a0,0
+80100014:	00008067          	ret
+
+Disassembly of section .text._trm_init:
+
+80100018 <_trm_init>:
+80100018:	80000537          	lui	a0,0x80000
+8010001c:	ff010113          	addi	sp,sp,-16
+80100020:	00050513          	mv	a0,a0
+80100024:	00112623          	sw	ra,12(sp)
+80100028:	fe9ff0ef          	jal	ra,80100010 <_etext>
+8010002c:	00050513          	mv	a0,a0
+80100030:	0000006b          	0x6b
+80100034:	0000006f          	j	80100034 <_trm_init+0x1c>

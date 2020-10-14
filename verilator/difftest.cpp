@@ -65,23 +65,24 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
     }
     ref_r[4] = 0x0000000000000444;
     ref_difftest_setregs(ref_r);        // test setregs*/
-    ref_isa_reg_display();
+    
     ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display();  
-    ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display(); 
-    ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display(); 
-    ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display();
-    ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display();
-    ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display();
-    int i=100;
+    //ref_isa_reg_display();
+    reg_t reg_ref[NUM_REG+7];
+    ref_difftest_getregs(&reg_ref);
+    reg_t temp=reg_ref[32];
+
+    int i=2000;
     while(i--){
-    ref_difftest_exec(1);               // test exec
-    ref_isa_reg_display();
+        ref_difftest_exec(1);               // test exec
+        //ref_isa_reg_display();
+        ref_difftest_getregs(&reg_ref);
+        if(temp==reg_ref[32]){
+            return;
+        }
+        else{
+            temp=reg_ref[32];
+        }
     }
 }
 /*
