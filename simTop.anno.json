@@ -1,156 +1,131 @@
 [
   {
-    "class":"firrtl.transforms.CombinationalPath",
-    "sink":"~simTop|simTop>io_coreIO_dataWriteIO_data",
-    "sources":[
-      "~simTop|simTop>io_coreIO_instReadIO_data"
-    ]
-  },
-  {
-    "class":"firrtl.transforms.CombinationalPath",
-    "sink":"~simTop|simTop>io_coreIO_dataWriteIO_addr",
-    "sources":[
-      "~simTop|simTop>io_coreIO_instReadIO_data"
-    ]
-  },
-  {
-    "class":"firrtl.transforms.CombinationalPath",
-    "sink":"~simTop|simTop>io_coreIO_dataReadIO_addr",
-    "sources":[
-      "~simTop|simTop>io_coreIO_instReadIO_data"
-    ]
+    "class":"firrtl.transforms.DontTouchAnnotation",
+    "target":"~simTop|REGFILE>_T_42_0"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>pc_reg"
+    "target":"~simTop|REGFILE>_T_42_1"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_0"
+    "target":"~simTop|REGFILE>_T_42_2"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_1"
+    "target":"~simTop|REGFILE>_T_42_3"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_2"
+    "target":"~simTop|REGFILE>_T_42_4"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_3"
+    "target":"~simTop|REGFILE>_T_42_5"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_4"
+    "target":"~simTop|REGFILE>_T_42_6"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_5"
+    "target":"~simTop|REGFILE>_T_42_7"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_6"
+    "target":"~simTop|REGFILE>_T_42_8"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_7"
+    "target":"~simTop|REGFILE>_T_42_9"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_8"
+    "target":"~simTop|REGFILE>_T_42_10"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_9"
+    "target":"~simTop|REGFILE>_T_42_11"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_10"
+    "target":"~simTop|REGFILE>_T_42_12"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_11"
+    "target":"~simTop|REGFILE>_T_42_13"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_12"
+    "target":"~simTop|REGFILE>_T_42_14"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_13"
+    "target":"~simTop|REGFILE>_T_42_15"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_14"
+    "target":"~simTop|REGFILE>_T_42_16"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_15"
+    "target":"~simTop|REGFILE>_T_42_17"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_16"
+    "target":"~simTop|REGFILE>_T_42_18"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_17"
+    "target":"~simTop|REGFILE>_T_42_19"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_18"
+    "target":"~simTop|REGFILE>_T_42_20"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_19"
+    "target":"~simTop|REGFILE>_T_42_21"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_20"
+    "target":"~simTop|REGFILE>_T_42_22"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_21"
+    "target":"~simTop|REGFILE>_T_42_23"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_22"
+    "target":"~simTop|REGFILE>_T_42_24"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_23"
+    "target":"~simTop|REGFILE>_T_42_25"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_24"
+    "target":"~simTop|REGFILE>_T_42_26"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_25"
+    "target":"~simTop|REGFILE>_T_42_27"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_26"
+    "target":"~simTop|REGFILE>_T_42_28"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_27"
+    "target":"~simTop|REGFILE>_T_42_29"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_28"
+    "target":"~simTop|REGFILE>_T_42_30"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_29"
-  },
-  {
-    "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_30"
-  },
-  {
-    "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~simTop|dpath>_T_149_31"
+    "target":"~simTop|REGFILE>_T_42_31"
   },
   {
     "class":"firrtl.options.TargetDirAnnotation",
