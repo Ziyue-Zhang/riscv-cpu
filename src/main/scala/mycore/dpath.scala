@@ -7,12 +7,6 @@ import chisel3.util.experimental.BoringUtils
 import common.constant._
 import common._
 
-//定义cpath到dpath的一些控制信号
-//inst:从memory中读取的instruction
-//br_eq:分支判断条件，当判断为相等时
-//br_lt:分支判断条件，当有符号数，判断为小于时
-//br_ltu:分支判断条件，当无符号数，判断为小于时
-//csr_eret:当当前的执行指令为csr的call/break/ret时，该位置1
 class DatToCtlIo extends Bundle()
 {
   val dec_inst   = Output(UInt(XLEN.W))
@@ -37,16 +31,18 @@ class dpath extends Module
   val io = IO(new DpathIo())
   io := DontCare
 
-  //**********************************
+  //***********************************************
   // Pipeline State Registers
 
   // Instruction Fetch State
-  val if_reg_pc             = RegInit(START_ADDR)
+  val if_reg_pc             = RegInit(START_ADDR - 4.U)
+  val if_valid = RegInit(false.B)
 
   // Instruction Decode State
   val dec_reg_valid         = RegInit(false.B)
   val dec_reg_inst          = RegInit(BUBBLE)
   val dec_reg_pc            = RegInit(0.asUInt(XLEN.W))
+  val dec_ready             = Wire(Bool())
 
   // Execute State
   val exe_reg_valid         = RegInit(false.B)
@@ -67,6 +63,7 @@ class dpath extends Module
   val exe_reg_ctrl_mem_fcn  = RegInit(M_X)
   val exe_reg_ctrl_mem_typ  = RegInit(MT_X)
   val exe_reg_ctrl_csr_cmd  = RegInit(CSR.N)
+  val exe_ready             = Wire(Bool())
 
   // Memory State
   val mem_reg_valid         = RegInit(false.B)
@@ -85,14 +82,16 @@ class dpath extends Module
   val mem_reg_ctrl_mem_typ  = RegInit(MT_X)
   val mem_reg_ctrl_wb_sel   = Reg(UInt())
   val mem_reg_ctrl_csr_cmd  = RegInit(CSR.N)
+  val mem_ready             = Wire(Bool())
 
   // Writeback State
   val wb_reg_valid          = RegInit(false.B)
   val wb_reg_wbaddr         = Reg(UInt())
   val wb_reg_wbdata         = Reg(UInt(XLEN.W))
   val wb_reg_ctrl_rf_wen    = RegInit(false.B)
+  val wb_ready              = Wire(Bool())
 
-  //**********************************
+  //***********************************************
   // Instruction Fetch Stage
   val if_pc_next          = Wire(UInt(XLEN.W))
   val exe_brjmp_target    = Wire(UInt(XLEN.W))
@@ -106,17 +105,16 @@ class dpath extends Module
   if_pc_next := Mux(io.ctl.exe_pc_sel === PC_4,      if_pc_plus4,
                 Mux(io.ctl.exe_pc_sel === PC_BRJMP,  exe_brjmp_target,
                 Mux(io.ctl.exe_pc_sel === PC_JALR,   exe_jump_reg_target,
-                BUBBLE)))    // TODO:
+                BUBBLE)))    
 
 
-  // 获取此时的inst指令
-  // TODO: inst Read
+  // get inst
   io.instReadIO.addr := if_reg_pc
   io.instReadIO.en := true.B
   val if_inst = Wire(UInt(XLEN.W))
   if_inst := io.instReadIO.data
 
-  // 传递流水线中的reg
+  // pass regs
   dec_reg_valid := true.B
   dec_reg_inst  := if_inst
   dec_reg_pc    := if_reg_pc
@@ -176,7 +174,6 @@ class dpath extends Module
   val dec_rs2_data = Wire(UInt(XLEN.W))
 
 
-  // TODO: 可以改成前递的方式
   // Rely only on control interlocking to resolve hazards
   dec_op1_data := MuxCase(rf_rs1_data, Array(
     ((io.ctl.op1_sel === OP1_IMZ)) -> imm_z,
@@ -185,7 +182,7 @@ class dpath extends Module
   dec_rs2_data := rf_rs2_data
   dec_op2_data := dec_alu_op2
 
-  // 传递流水线reg
+   // 传递流水线
   exe_reg_pc            := dec_reg_pc
   exe_reg_rs1_addr      := dec_rs1_addr
   exe_reg_rs2_addr      := dec_rs2_addr
@@ -214,14 +211,14 @@ class dpath extends Module
 
   // ALU
   val alu = Module(new alu)
-  alu.io.op := exe_reg_ctrl_alu_fun     // 这里应该用decode缓存一次的func!
+  alu.io.op := exe_reg_ctrl_alu_fun    
   alu.io.src1   := exe_alu_op1
   alu.io.src2   := exe_alu_op2
   exe_alu_out   := alu.io.res
   val exe_adder_out = (exe_alu_op1 + exe_alu_op2)(XLEN-1,0)
 
   // Branch/Jump Target Calculation
-  val brjmp_offset    = exe_reg_op2_data
+  val brjmp_offset     = exe_reg_op2_data
   exe_brjmp_target    := exe_reg_pc + brjmp_offset
   exe_jump_reg_target := exe_adder_out
 
@@ -271,17 +268,18 @@ class dpath extends Module
   //******************************************************************************************************
   // External Signals
 
-   // datapath to controlpath outputs
-   io.dat.dec_inst   := dec_reg_inst
-   io.dat.exe_br_eq  := (exe_reg_op1_data === exe_reg_rs2_data)
-   io.dat.exe_br_lt  := (exe_reg_op1_data.asSInt() < exe_reg_rs2_data.asSInt())
-   io.dat.exe_br_ltu := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
-   io.dat.exe_br_type:= exe_reg_ctrl_br_type
-
-    // datapath to data memory outputs
-    io.dataWriteIO.en := true.B
-    io.dataWriteIO.addr := mem_reg_alu_out.asUInt()
-    io.dataWriteIO.data := mem_reg_rs2_data     // TODO: 为何写入mem的rf的第二个读取值?
+  // datapath to controlpath outputs
+  io.dat.dec_inst   := dec_reg_inst
+  io.dat.exe_br_eq  := (exe_reg_op1_data === exe_reg_rs2_data)
+  io.dat.exe_br_lt  := (exe_reg_op1_data.asSInt() < exe_reg_rs2_data.asSInt())
+  io.dat.exe_br_ltu := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
+  io.dat.exe_br_type:= exe_reg_ctrl_br_type
+  
+  // datapath to data memory outputs
+  io.dataWriteIO.en := true.B
+  io.dataWriteIO.addr := mem_reg_alu_out.asUInt()
+  io.dataWriteIO.data := mem_reg_rs2_data     
 }
 
  
+
