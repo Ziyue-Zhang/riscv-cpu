@@ -12,6 +12,7 @@ import common.MemPortIo
 
 class CtlToDatIo extends Bundle()
 {
+   val dec_stall  = Output(Bool())    // stall IF/DEC stages (due to hazards)
    val exe_pc_sel = Output(UInt(2.W))
    val br_type    = Output(UInt(4.W))
    val if_kill    = Output(Bool())
@@ -24,6 +25,7 @@ class CtlToDatIo extends Bundle()
    val mem_val    = Output(Bool())
    val mem_fcn    = Output(UInt(2.W))
    val mem_typ    = Output(UInt(3.W))
+   val csr_cmd    = Output(UInt(CSR.SZ))
 }
 
 //定义cpath模块的端口
@@ -113,9 +115,66 @@ class cpath() extends Module
 
    val ifkill  = (ctrl_exe_pc_sel =/= PC_4) 
    val deckill = (ctrl_exe_pc_sel =/= PC_4)
+
+   val stall   = Wire(Bool())
+
+   val dec_rs1_addr = io.dat.dec_inst(19, 15)
+   val dec_rs2_addr = io.dat.dec_inst(24, 20)
+   val dec_wbaddr   = io.dat.dec_inst(11, 7)
+   val dec_rs1_oen  = Mux(deckill, false.B, cs_rs1_oen)
+   val dec_rs2_oen  = Mux(deckill, false.B, cs_rs2_oen)
+
+   val exe_reg_wbaddr      = Reg(UInt())
+   val mem_reg_wbaddr      = Reg(UInt())
+   val wb_reg_wbaddr       = Reg(UInt())
+   val exe_reg_ctrl_rf_wen = RegInit(false.B)
+   val mem_reg_ctrl_rf_wen = RegInit(false.B)
+   val wb_reg_ctrl_rf_wen  = RegInit(false.B)
+   //val exe_reg_exception   = RegInit(false.B)
+
+   //val exe_reg_is_csr = RegInit(false.B)
+
+   // TODO rename stall==hazard_stall full_stall == cmiss_stall
+
+   when (!stall)
+   {
+      when (deckill)
+      {
+         exe_reg_wbaddr      := 0.U
+         exe_reg_ctrl_rf_wen := false.B
+      }
+      .otherwise
+      {
+         exe_reg_wbaddr      := dec_wbaddr
+         exe_reg_ctrl_rf_wen := cs_rf_wen
+      }
+   }
+   .elsewhen (stall)
+   {
+      // kill exe stage
+      exe_reg_wbaddr      := 0.U
+      exe_reg_ctrl_rf_wen := false.B
+   }
+
+   mem_reg_wbaddr      := exe_reg_wbaddr
+   wb_reg_wbaddr       := mem_reg_wbaddr
+   mem_reg_ctrl_rf_wen := exe_reg_ctrl_rf_wen
+   wb_reg_ctrl_rf_wen  := mem_reg_ctrl_rf_wen
+
+   val exe_inst_is_load = RegInit(false.B)
+
+   exe_inst_is_load := cs_mem_en && (cs_mem_fcn === M_XRD)
+
+   // Stall signal stalls instruction fetch & decode stages,
+   // inserts NOP into execute stage,  and drains execute, memory, and writeback stages
+   // stalls on I$ misses and on hazards
+
+   stall := ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs1_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs1_oen) ||
+            ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs2_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs2_oen)
  
    //将指令解码的控制信号分别赋给相应的端口，准备好送给dpath
    // Set the data-path control signals
+   io.ctl.dec_stall  := stall
    io.ctl.exe_pc_sel := ctrl_exe_pc_sel
    io.ctl.br_type    := cs_br_type
    io.ctl.if_kill    := ifkill
@@ -125,5 +184,10 @@ class cpath() extends Module
    io.ctl.alu_fun    := cs_alu_fun
    io.ctl.wb_sel     := cs_wb_sel
    io.ctl.rf_wen     := cs_rf_wen
+
+   // convert CSR instructions with raddr1 == 0 to read-only CSR commands
+   val rs1_addr = io.dat.dec_inst(RS1_MSB, RS1_LSB)
+   val csr_ren = (cs_csr_cmd === CSR.S || cs_csr_cmd === CSR.C) && rs1_addr === 0.U
+   io.ctl.csr_cmd := Mux(csr_ren, CSR.R, cs_csr_cmd)
 }
 

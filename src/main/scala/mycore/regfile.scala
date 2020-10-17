@@ -24,7 +24,7 @@ class REGFILE() extends Module
 
    val regfile = Mem(32, UInt(XLEN.W))
 
-   when (io.wen.toBool() && (io.waddr =/= 0.U))
+   when (io.wen.asBool() && (io.waddr =/= 0.U))
    {
       regfile(io.waddr) := io.wdata
    }
