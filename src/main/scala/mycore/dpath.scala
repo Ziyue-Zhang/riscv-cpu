@@ -212,7 +212,7 @@ class dpath extends Module
 
   // 传递流水线
   when(!io.ctl.dec_stall)
-   {
+  {
       // no stalling...
       exe_reg_pc            := dec_reg_pc
       exe_reg_rs1_addr      := dec_rs1_addr

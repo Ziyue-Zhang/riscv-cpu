@@ -3,8 +3,9 @@
 #include <assert.h>
 using namespace std;
 #include "difftest.h"
+#include "emu.h"
 
-const char* dllPath = "/home/zzy/kisscpu/verilator/nemu_so/riscv64-nemu-interpreter-so";
+const char* dllPath = "/home/zzy/Desktop/riscv/verilator/nemu_so/riscv64-nemu-interpreter-so";
 // 等待获取的6个函数指针
 void (*ref_difftest_memcpy_from_dut)(reg_t dest, void *src, size_t n);
 void (*ref_difftest_getregs)(void *c);
@@ -42,31 +43,9 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
     ref_difftest_init();
     ref_isa_reg_display();
 
-    // 添加img
     ref_difftest_memcpy_from_dut(ADDR_START, ram->get_img_start(), ram->get_img_size());
-    printf("img size = %d\n",ram->get_img_size());
-    
 
-
-    // test memread, write
-    /*
-    paddr_t inst = ram->InstRead(ADDRSTART+8, true);
-    printf("inst = 0x%016lx \n", inst);
-    paddr_t data = 0x000000000002a025;
-    ram->DataWrite(ADDRSTART, data, true, 0);
-    paddr_t data2 = ram->DataRead(ADDRSTART, true);
-    printf("data = 0x%016lx \n", data2);
-    // test
-    reg_t ref_r[DIFFTEST_NR_REG];
-    ref_difftest_getregs(&ref_r);       // test getregs
-    for (size_t i = 0; i < DIFFTEST_NR_REG; i++)
-    {
-        printf("reg[%d] = 0x%016lx \n", i, ref_r[i]);
-    }
-    ref_r[4] = 0x0000000000000444;
-    ref_difftest_setregs(ref_r);        // test setregs*/
-    
-    ref_difftest_exec(1);               // test exec
+    /*ref_difftest_exec(1);               // test exec
     //ref_isa_reg_display();
     reg_t reg_ref[NUM_REG+7];
     ref_difftest_getregs(&reg_ref);
@@ -83,35 +62,39 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
         else{
             temp=reg_ref[32];
         }
-    }
-}
-/*
-int main(){
-    printf("start\n");
-    init_difftest(0, NULL);
-    printf("end\n");
-    return 0;
-}*/
-
-// 输入reg_dut
-void difftest_step()
-{
-    // emu走一条, nemu走一条, 比对, 错误就输出
-    reg_t reg_dut[NUM_REG];
-    reg_t reg_ref[NUM_REG];
-    ref_difftest_exec(1);
-    //ref_difftest_getregs(&reg_ref);
-    // 每个比对
-    ref_isa_reg_display();
-    /*for (size_t i = 0; i < 32; i++)
-    {
-        if (reg_dut[i] != reg_ref[i])
-        {
-            printf("reg %d %s different at pc = [0x%16lx], right=[0x%16lx], wrong=[0x%16lx]\n",
-                i, reg_name[i], reg_dut[32], reg_ref[i], reg_dut[i]);
-        }
-        
     }*/
-    
+}
 
+void difftest_step(Emu* emu) {
+    reg_t reg_dut[DIFFTEST_NR_REG];
+    reg_t reg_ref[DIFFTEST_NR_REG];
+    reg_t temp=0;
+    for(; i>0; i--) {
+        emu->step(1);
+        emu->emu_difftest_getregs(reg_dut);
+        ref_difftest_exec(1);
+        ref_difftest_getregs(&reg_ref);
+        if(temp==reg_ref[32]){
+            return;
+        }
+        else{
+            temp=reg_ref[32];
+        }
+        //ref_isa_reg_display();
+        bool flag = false;
+        for (int i = 0; i < 32; i++) {
+            if (reg_dut[i] != reg_ref[i]) {
+                printf("reg %d %s different at pc = [0x%16lx], nemu=[0x%16lx], mycore=[0x%16lx]\n",
+                i, reg_name[i], reg_dut[32], reg_ref[i], reg_dut[i]);
+                flag=true;
+            }
+        }
+        if(reg_dut[32] != reg_ref[32]) {
+            printf("right pc = [0x%16x], wrong pc = [0x%16x] \n", reg_ref[32], reg_dut[32]);
+            flag=true;
+        }
+        if(flag){
+            return;
+        }
+    }
 }
