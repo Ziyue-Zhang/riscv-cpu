@@ -704,14 +704,17 @@ circuit simTop :
     io.ctl.alu_fun <= cs0_0 @[cpath.scala 184:22]
     io.ctl.wb_sel <= cs0_1 @[cpath.scala 185:22]
     io.ctl.rf_wen <= cs0_2 @[cpath.scala 186:22]
-    node rs1_addr = bits(io.dat.dec_inst, 19, 15) @[cpath.scala 189:34]
-    node _T_619 = eq(cs0_6, UInt<3>("h02")) @[cpath.scala 190:30]
-    node _T_620 = eq(cs0_6, UInt<3>("h03")) @[cpath.scala 190:54]
-    node _T_621 = or(_T_619, _T_620) @[cpath.scala 190:40]
-    node _T_622 = eq(rs1_addr, UInt<1>("h00")) @[cpath.scala 190:77]
-    node csr_ren = and(_T_621, _T_622) @[cpath.scala 190:65]
-    node _T_623 = mux(csr_ren, UInt<3>("h05"), cs0_6) @[cpath.scala 191:25]
-    io.ctl.csr_cmd <= _T_623 @[cpath.scala 191:19]
+    io.ctl.mem_val <= cs0_3 @[cpath.scala 188:22]
+    io.ctl.mem_fcn <= cs0_4 @[cpath.scala 189:22]
+    io.ctl.mem_typ <= cs0_5 @[cpath.scala 190:22]
+    node rs1_addr = bits(io.dat.dec_inst, 19, 15) @[cpath.scala 193:34]
+    node _T_619 = eq(cs0_6, UInt<3>("h02")) @[cpath.scala 194:30]
+    node _T_620 = eq(cs0_6, UInt<3>("h03")) @[cpath.scala 194:54]
+    node _T_621 = or(_T_619, _T_620) @[cpath.scala 194:40]
+    node _T_622 = eq(rs1_addr, UInt<1>("h00")) @[cpath.scala 194:77]
+    node csr_ren = and(_T_621, _T_622) @[cpath.scala 194:65]
+    node _T_623 = mux(csr_ren, UInt<3>("h05"), cs0_6) @[cpath.scala 195:25]
+    io.ctl.csr_cmd <= _T_623 @[cpath.scala 195:19]
     
   module REGFILE : 
     input clock : Clock
@@ -1090,7 +1093,7 @@ circuit simTop :
     node _T_111 = mux(_T_100, exe_alu_out, _T_110) @[Mux.scala 98:16]
     dec_rs2_data <= _T_111 @[dpath.scala 207:16]
     node _T_112 = eq(io.ctl.dec_stall, UInt<1>("h00")) @[dpath.scala 214:8]
-    when _T_112 : @[dpath.scala 215:4]
+    when _T_112 : @[dpath.scala 215:3]
       exe_reg_pc <= dec_reg_pc @[dpath.scala 217:29]
       exe_reg_rs1_addr <= dec_rs1_addr @[dpath.scala 218:29]
       exe_reg_rs2_addr <= dec_rs2_addr @[dpath.scala 219:29]
@@ -1121,7 +1124,7 @@ circuit simTop :
         exe_reg_ctrl_csr_cmd <= io.ctl.csr_cmd @[dpath.scala 247:32]
         exe_reg_ctrl_br_type <= io.ctl.br_type @[dpath.scala 248:32]
         skip @[dpath.scala 239:7]
-      skip @[dpath.scala 215:4]
+      skip @[dpath.scala 215:3]
     inst alu of alu @[dpath.scala 259:19]
     alu.clock <= clock
     alu.reset <= reset
@@ -1194,19 +1197,19 @@ circuit simTop :
     when _T_136 : @[dpath.scala 316:9]
       printf(clock, UInt<1>(1), "WB : pc=[%x] inst=[%x]\n", _T_133, _T_134) @[dpath.scala 316:9]
       skip @[dpath.scala 316:9]
-    io.dat.dec_inst <= dec_reg_inst @[dpath.scala 322:21]
-    node _T_137 = eq(exe_alu_op1, exe_reg_rs2_data) @[dpath.scala 323:42]
-    io.dat.exe_br_eq <= _T_137 @[dpath.scala 323:21]
-    node _T_138 = asSInt(exe_alu_op1) @[dpath.scala 324:48]
-    node _T_139 = asSInt(exe_reg_rs2_data) @[dpath.scala 324:76]
-    node _T_140 = lt(_T_138, _T_139) @[dpath.scala 324:51]
-    io.dat.exe_br_lt <= _T_140 @[dpath.scala 324:21]
-    node _T_141 = lt(exe_alu_op1, exe_reg_rs2_data) @[dpath.scala 325:51]
-    io.dat.exe_br_ltu <= _T_141 @[dpath.scala 325:21]
-    io.dat.exe_br_type <= exe_reg_ctrl_br_type @[dpath.scala 326:21]
-    io.data_write_io.en <= UInt<1>("h01") @[dpath.scala 329:23]
-    io.data_write_io.addr <= mem_reg_alu_out @[dpath.scala 330:25]
-    io.data_write_io.data <= mem_reg_rs2_data @[dpath.scala 331:25]
+    io.dat.dec_inst <= dec_reg_inst @[dpath.scala 323:21]
+    node _T_137 = eq(exe_alu_op1, exe_reg_rs2_data) @[dpath.scala 324:42]
+    io.dat.exe_br_eq <= _T_137 @[dpath.scala 324:21]
+    node _T_138 = asSInt(exe_alu_op1) @[dpath.scala 325:48]
+    node _T_139 = asSInt(exe_reg_rs2_data) @[dpath.scala 325:76]
+    node _T_140 = lt(_T_138, _T_139) @[dpath.scala 325:51]
+    io.dat.exe_br_lt <= _T_140 @[dpath.scala 325:21]
+    node _T_141 = lt(exe_alu_op1, exe_reg_rs2_data) @[dpath.scala 326:51]
+    io.dat.exe_br_ltu <= _T_141 @[dpath.scala 326:21]
+    io.dat.exe_br_type <= exe_reg_ctrl_br_type @[dpath.scala 327:21]
+    io.data_write_io.en <= UInt<1>("h01") @[dpath.scala 330:23]
+    io.data_write_io.addr <= mem_reg_alu_out @[dpath.scala 331:25]
+    io.data_write_io.data <= mem_reg_rs2_data @[dpath.scala 332:25]
     
   module core : 
     input clock : Clock
@@ -1251,7 +1254,7 @@ circuit simTop :
   module simTop : 
     input clock : Clock
     input reset : UInt<1>
-    output io : {diffTestIO : {regfile : UInt<64>[32], pc : UInt<64>}, coreIO : {inst_read_io : {addr : UInt<64>, flip data : UInt<64>, en : UInt<1>}, data_read_io : {addr : UInt<64>, flip data : UInt<64>, en : UInt<1>}, data_write_io : {addr : UInt<64>, data : UInt<64>, en : UInt<1>}}}
+    output io : {diffTestIO : {regfile : UInt<64>[32], pc : UInt<64>, valid : UInt<1>}, coreIO : {inst_read_io : {addr : UInt<64>, flip data : UInt<64>, en : UInt<1>}, data_read_io : {addr : UInt<64>, flip data : UInt<64>, en : UInt<1>}, data_write_io : {addr : UInt<64>, data : UInt<64>, en : UInt<1>}}}
     
     io.coreIO.data_write_io.en is invalid @[simTop.scala 13:6]
     io.coreIO.data_write_io.data is invalid @[simTop.scala 13:6]
@@ -1262,6 +1265,7 @@ circuit simTop :
     io.coreIO.inst_read_io.en is invalid @[simTop.scala 13:6]
     io.coreIO.inst_read_io.data is invalid @[simTop.scala 13:6]
     io.coreIO.inst_read_io.addr is invalid @[simTop.scala 13:6]
+    io.diffTestIO.valid is invalid @[simTop.scala 13:6]
     io.diffTestIO.pc is invalid @[simTop.scala 13:6]
     io.diffTestIO.regfile[0] is invalid @[simTop.scala 13:6]
     io.diffTestIO.regfile[1] is invalid @[simTop.scala 13:6]
@@ -1298,13 +1302,13 @@ circuit simTop :
     inst mycore of core @[simTop.scala 15:22]
     mycore.clock <= clock
     mycore.reset <= reset
-    io.coreIO.data_write_io.en <= mycore.io.data_write_io.en @[simTop.scala 18:13]
-    io.coreIO.data_write_io.data <= mycore.io.data_write_io.data @[simTop.scala 18:13]
-    io.coreIO.data_write_io.addr <= mycore.io.data_write_io.addr @[simTop.scala 18:13]
-    io.coreIO.data_read_io.en <= mycore.io.data_read_io.en @[simTop.scala 18:13]
-    mycore.io.data_read_io.data <= io.coreIO.data_read_io.data @[simTop.scala 18:13]
-    io.coreIO.data_read_io.addr <= mycore.io.data_read_io.addr @[simTop.scala 18:13]
-    io.coreIO.inst_read_io.en <= mycore.io.inst_read_io.en @[simTop.scala 18:13]
-    mycore.io.inst_read_io.data <= io.coreIO.inst_read_io.data @[simTop.scala 18:13]
-    io.coreIO.inst_read_io.addr <= mycore.io.inst_read_io.addr @[simTop.scala 18:13]
+    io.coreIO.data_write_io.en <= mycore.io.data_write_io.en @[simTop.scala 19:13]
+    io.coreIO.data_write_io.data <= mycore.io.data_write_io.data @[simTop.scala 19:13]
+    io.coreIO.data_write_io.addr <= mycore.io.data_write_io.addr @[simTop.scala 19:13]
+    io.coreIO.data_read_io.en <= mycore.io.data_read_io.en @[simTop.scala 19:13]
+    mycore.io.data_read_io.data <= io.coreIO.data_read_io.data @[simTop.scala 19:13]
+    io.coreIO.data_read_io.addr <= mycore.io.data_read_io.addr @[simTop.scala 19:13]
+    io.coreIO.inst_read_io.en <= mycore.io.inst_read_io.en @[simTop.scala 19:13]
+    mycore.io.inst_read_io.data <= io.coreIO.inst_read_io.data @[simTop.scala 19:13]
+    io.coreIO.inst_read_io.addr <= mycore.io.inst_read_io.addr @[simTop.scala 19:13]
     

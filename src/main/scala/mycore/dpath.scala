@@ -314,6 +314,7 @@ class dpath extends Module
   wb_reg_ctrl_rf_wen   := mem_reg_ctrl_rf_wen
 
   printf("WB : pc=[%x] inst=[%x]\n", RegNext(mem_reg_pc), RegNext(mem_reg_inst))
+  BoringUtils.addSource(wb_reg_valid, "diffTestValid")
 
   //******************************************************************************************************
   // External Signals

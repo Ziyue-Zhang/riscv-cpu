@@ -185,6 +185,10 @@ class cpath() extends Module
    io.ctl.wb_sel     := cs_wb_sel
    io.ctl.rf_wen     := cs_rf_wen
 
+   io.ctl.mem_val    := cs_mem_en
+   io.ctl.mem_fcn    := cs_mem_fcn
+   io.ctl.mem_typ    := cs_msk_sel
+
    // convert CSR instructions with raddr1 == 0 to read-only CSR commands
    val rs1_addr = io.dat.dec_inst(RS1_MSB, RS1_LSB)
    val csr_ren = (cs_csr_cmd === CSR.S || cs_csr_cmd === CSR.C) && rs1_addr === 0.U

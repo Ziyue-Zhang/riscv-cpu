@@ -15,6 +15,7 @@ class simTop extends Module{
   val mycore = Module(new core())
   BoringUtils.addSink(io.diffTestIO.regfile, "diffTestRegfile")
   BoringUtils.addSink(io.diffTestIO.pc, "diffTestPC")
+  BoringUtils.addSink(io.diffTestIO.valid, "diffTestValid")
   io.coreIO <> mycore.io
 
 }

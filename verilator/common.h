@@ -23,5 +23,6 @@ typedef uint32_t inst_t;
 typedef uint32_t mask_t;
 
 #define RAMSIZE (128 * 1024 * 1024)
+#define vcdTrace true
 
 #endif

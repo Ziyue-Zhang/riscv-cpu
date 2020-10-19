@@ -1,7 +1,7 @@
 #include "ram.h"
 #include "difftest.h"
 #include "difftestIO.h"
-#include "Emu.h"
+#include "emu.h"
 #include <iostream>
 using namespace std;
 
@@ -13,7 +13,7 @@ double emu_time_stamp(){
 int main(int argc, char** argv){
     Ram* new_ram = new Ram(argv[1]);
     init_difftest(0, NULL,new_ram);
-    Emu* emu = new Emu(ram, &emu_time);
+    Emu* emu = new Emu(new_ram, &emu_time);
     difftest_step(emu);
 
     return 0;

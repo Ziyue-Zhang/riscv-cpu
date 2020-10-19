@@ -66,10 +66,10 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
 }
 
 void difftest_step(Emu* emu) {
-    reg_t reg_dut[DIFFTEST_NR_REG];
-    reg_t reg_ref[DIFFTEST_NR_REG];
+    reg_t reg_dut[33];
+    reg_t reg_ref[NUM_REG+7];
     reg_t temp=0;
-    for(; i>0; i--) {
+    for(int i=10000; i>0; i--) {
         emu->step(1);
         emu->emu_difftest_getregs(reg_dut);
         ref_difftest_exec(1);
@@ -90,7 +90,7 @@ void difftest_step(Emu* emu) {
             }
         }
         if(reg_dut[32] != reg_ref[32]) {
-            printf("right pc = [0x%16x], wrong pc = [0x%16x] \n", reg_ref[32], reg_dut[32]);
+            printf("right pc = [0x%16lx], wrong pc = [0x%16lx] \n", reg_ref[32], reg_dut[32]);
             flag=true;
         }
         if(flag){
