@@ -70,8 +70,8 @@ void difftest_step(Emu* emu) {
     reg_t reg_ref[NUM_REG+7];
     reg_t temp=0;
     for(int i=10000; i>0; i--) {
-        emu->step(1);
-        emu->emu_difftest_getregs(reg_dut);
+        //emu->step(1);
+        //emu->emu_difftest_getregs(reg_dut);
         ref_difftest_exec(1);
         ref_difftest_getregs(&reg_ref);
         if(temp==reg_ref[32]){
@@ -81,7 +81,7 @@ void difftest_step(Emu* emu) {
             temp=reg_ref[32];
         }
         //ref_isa_reg_display();
-        bool flag = false;
+        /*bool flag = false;
         for (int i = 0; i < 32; i++) {
             if (reg_dut[i] != reg_ref[i]) {
                 printf("reg %d %s different at pc = [0x%16lx], nemu=[0x%16lx], mycore=[0x%16lx]\n",
@@ -95,6 +95,6 @@ void difftest_step(Emu* emu) {
         }
         if(flag){
             return;
-        }
+        }*/
     }
 }

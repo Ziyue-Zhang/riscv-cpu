@@ -114,9 +114,15 @@ class dpath extends Module
 
   // get inst
   val if_inst = Wire(UInt(XLEN.W))
-  val if_reg_inst = Reg(UInt(XLEN.W)) // 缓存一拍
-  if_reg_inst := io.inst_read_io.data
+  val if_reg_inst = Reg(UInt(XLEN.W)) // 缓存
+
+  io.inst_read_io.en := dec_reg_valid
+  when(io.inst_read_io.en){
+    if_reg_inst := io.inst_read_io.data
+  }
+
   if_inst := if_reg_inst
+
 
   // pass regs
   when (!io.ctl.dec_stall)
