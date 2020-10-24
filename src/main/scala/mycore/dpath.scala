@@ -35,7 +35,7 @@ class dpath extends Module
   // Pipeline State Registers
 
   // Instruction Fetch State
-  val if_reg_pc             = RegInit(START_ADDR - 4.U)
+  val if_reg_pc             = RegInit(UInt(XLEN.W), "h80000000".U)
   val if_valid              = RegInit(false.B)
   //val if_ready              = Wire(Bool())
 
@@ -87,6 +87,7 @@ class dpath extends Module
 
   // Writeback State
   val wb_reg_valid          = RegInit(false.B)
+  val wb_reg_pc            = Reg(UInt(XLEN.W))
   val wb_reg_wbaddr         = Reg(UInt())
   val wb_reg_wbdata         = Reg(UInt(XLEN.W))
   val wb_reg_ctrl_rf_wen    = RegInit(false.B)
@@ -97,12 +98,6 @@ class dpath extends Module
   val if_pc_next          = Wire(UInt(XLEN.W))
   val exe_brjmp_target    = Wire(UInt(XLEN.W))
   val exe_jump_reg_target = Wire(UInt(XLEN.W))
-
-  when (!io.ctl.dec_stall)
-  {
-      if_reg_pc := if_pc_next
-  }
-
 
   val if_pc_plus4 = (if_reg_pc + 4.asUInt(XLEN.W))
 
@@ -116,15 +111,21 @@ class dpath extends Module
   val if_inst = Wire(UInt(XLEN.W))
   val if_reg_inst = Reg(UInt(XLEN.W)) // 缓存
 
-  io.inst_read_io.en := dec_reg_valid
+  io.inst_read_io.addr := if_reg_pc
+  io.inst_read_io.en := true. B
+
   when(io.inst_read_io.en){
     if_reg_inst := io.inst_read_io.data
   }
 
   if_inst := if_reg_inst
 
+  when (!io.ctl.dec_stall)
+  {
+      if_reg_pc := if_pc_next
+  }
 
-  // pass regs
+  // pass inst
   when (!io.ctl.dec_stall)
   {
       when (io.ctl.if_kill)
@@ -140,6 +141,8 @@ class dpath extends Module
 
       dec_reg_pc := if_reg_pc
   }
+
+  printf("IF: if_reg_pc=[%x] if_valid=[%d] \n",if_reg_pc,if_valid)
   
   //*******************************************************************************************************
   // Decode Stage
@@ -315,11 +318,13 @@ class dpath extends Module
   // Writeback Stage
 
   wb_reg_valid         := mem_reg_valid
+  wb_reg_pc            := mem_reg_pc
   wb_reg_wbaddr        := mem_reg_wbaddr
   wb_reg_wbdata        := mem_wbdata
   wb_reg_ctrl_rf_wen   := mem_reg_ctrl_rf_wen
 
   printf("WB : pc=[%x] inst=[%x]\n", RegNext(mem_reg_pc), RegNext(mem_reg_inst))
+  BoringUtils.addSource(wb_reg_pc, "diffTestPC")
   BoringUtils.addSource(wb_reg_valid, "diffTestValid")
 
   //******************************************************************************************************

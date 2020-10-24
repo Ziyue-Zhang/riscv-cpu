@@ -98,7 +98,6 @@ class cpath() extends Module
    val (cs_val_inst: Bool) :: cs_br_type :: cs_op1_sel :: cs_op2_sel :: (cs_rs1_oen: Bool) :: (cs_rs2_oen: Bool) :: cs0 = csignals
    val cs_alu_fun :: cs_wb_sel :: (cs_rf_wen: Bool) :: (cs_mem_en: Bool) :: cs_mem_fcn :: cs_msk_sel :: cs_csr_cmd :: (cs_fencei: Bool) :: Nil = cs0
                
-   // 利用cs_br_type的新值和io.dat.br_x中的返回值判断下一个pc是否为跳转的情况，为什么要用上io.dat.br_x? 因为某些循环会用到上次的值，例如要循环100次，判断cs_br_type知道指令为跳转指令，但不知道循环了多少次，所以需要用io.dat.br_x来记录
    // Branch Logic   
    val ctrl_exe_pc_sel = Mux(false.B                      , PC_EXC,
                          Mux(io.dat.exe_br_type === BR_N  , PC_4,

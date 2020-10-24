@@ -31,7 +31,7 @@ void VsimTop::eval_step() {
             Verilated::debug(1);
             __Vchange = _change_request(vlSymsp);
             Verilated::debug(__Vsaved_debug);
-            VL_FATAL_MT("simTop.v", 1715, "",
+            VL_FATAL_MT("simTop.v", 1748, "",
                 "Verilated model didn't converge\n"
                 "- See DIDNOTCONVERGE in the Verilator manual");
         } else {
@@ -57,7 +57,7 @@ void VsimTop::_eval_initial_loop(VsimTop__Syms* __restrict vlSymsp) {
             Verilated::debug(1);
             __Vchange = _change_request(vlSymsp);
             Verilated::debug(__Vsaved_debug);
-            VL_FATAL_MT("simTop.v", 1715, "",
+            VL_FATAL_MT("simTop.v", 1748, "",
                 "Verilated model didn't DC converge\n"
                 "- See DIDNOTCONVERGE in the Verilator manual");
         } else {
@@ -190,46 +190,10 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         __Vdlyvdim0__simTop__DOT__mycore__DOT__dpath__DOT__regfile__DOT__regfile__v0 
             = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbaddr;
     }
-    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc;
-    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_134 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
-    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
-        VL_FWRITEF(0x80000002U,"EXE: alu_op=[%x] alu_out=[%x] \n",
-                   4,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res);
-    }
-    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
-        VL_FWRITEF(0x80000002U,"EXE: pc=[%x] inst=[%x] \n",
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst);
-    }
-    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
-        VL_FWRITEF(0x80000002U,"MEM: pc=[%x] inst=[%x] wb_sel=[%1#] wbdata=[%x]\n",
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst,
-                   2,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel),
-                   64,((0U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
-                        ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out
-                        : ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
-                            ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out
-                            : ((1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
-                                ? vlTOPp->io_coreIO_data_read_io_data
-                                : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out))));
-    }
-    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
-        VL_FWRITEF(0x80000002U,"WB : pc=[%x] inst=[%x]\n",
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_134);
-    }
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs2_data 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data;
     if (vlTOPp->reset) {
-        __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc = 0x7ffffffcULL;
+        __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc = 0x80000000ULL;
     } else {
         if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
             __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc 
@@ -244,93 +208,9 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                             : 0x4033ULL)));
         }
     }
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133 
-        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_134 
-        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_134;
     vlTOPp->io_diffTestIO_valid = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_valid;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_valid 
         = ((~ (IData)(vlTOPp->reset)) & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_valid));
-    if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
-        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun 
-            = ((0x2003ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                ? 0U : ((3ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                         ? 0U : ((0x4003ULL == (0x707fULL 
-                                                & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                  ? 0U : ((0x1003ULL 
-                                           == (0x707fULL 
-                                               & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                           ? 0U : (
-                                                   (0x5003ULL 
-                                                    == 
-                                                    (0x707fULL 
-                                                     & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                    ? 0U
-                                                    : 
-                                                   ((0x2023ULL 
-                                                     == 
-                                                     (0x707fULL 
-                                                      & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                     ? 0U
-                                                     : 
-                                                    ((0x23ULL 
-                                                      == 
-                                                      (0x707fULL 
-                                                       & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                      ? 0U
-                                                      : 
-                                                     ((0x1023ULL 
-                                                       == 
-                                                       (0x707fULL 
-                                                        & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                       ? 0U
-                                                       : 
-                                                      ((0x17ULL 
-                                                        == 
-                                                        (0x7fULL 
-                                                         & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                        ? 0U
-                                                        : 
-                                                       ((0x37ULL 
-                                                         == 
-                                                         (0x7fULL 
-                                                          & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                         ? 0xbU
-                                                         : 
-                                                        ((0x13ULL 
-                                                          == 
-                                                          (0x707fULL 
-                                                           & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                          ? 0U
-                                                          : 
-                                                         ((0x7013ULL 
-                                                           == 
-                                                           (0x707fULL 
-                                                            & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                           ? 5U
-                                                           : 
-                                                          ((0x6013ULL 
-                                                            == 
-                                                            (0x707fULL 
-                                                             & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                            ? 6U
-                                                            : 
-                                                           ((0x4013ULL 
-                                                             == 
-                                                             (0x707fULL 
-                                                              & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                                                             ? 7U
-                                                             : (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_312)))))))))))))));
-    }
-    if (vlTOPp->reset) {
-        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst = 0x4033ULL;
-    } else {
-        if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
-            vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst 
-                = ((0U != (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__ctrl_exe_pc_sel))
-                    ? 0x4033ULL : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst);
-        }
-    }
     vlTOPp->io_coreIO_data_write_io_data = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs2_data;
     if (vlTOPp->reset) {
         __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc = 0ULL;
@@ -547,14 +427,6 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                    & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_valid));
         }
     }
-    if (vlTOPp->reset) {
-        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_pc = 0ULL;
-    } else {
-        if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
-            vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_pc 
-                = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
-        }
-    }
     vlTOPp->io_diffTestIO_regfile_0 = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__regfile__DOT__regfile
         [0U];
     vlTOPp->io_diffTestIO_regfile_1 = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__regfile__DOT__regfile
@@ -627,18 +499,60 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
     vlTOPp->simTop__DOT__mycore__DOT__dpath_io_dat_exe_br_ltu 
         = (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
            < vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data);
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out 
-        = ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel))
-            ? (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc)
-            : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res);
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbaddr 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_wbaddr;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_ctrl_rf_wen 
         = ((~ (IData)(vlTOPp->reset)) & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_rf_wen));
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc 
-        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
+    if (vlTOPp->reset) {
+        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_pc = 0ULL;
+    } else {
+        if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
+            vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_pc 
+                = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
+        }
+    }
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc;
+    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc;
+    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_134 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
+    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
+        VL_FWRITEF(0x80000002U,"IF: if_reg_pc=[%x] if_valid=[0] \n",
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc);
+    }
+    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
+        VL_FWRITEF(0x80000002U,"EXE: alu_op=[%x] alu_out=[%x] \n",
+                   4,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res);
+    }
+    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
+        VL_FWRITEF(0x80000002U,"EXE: pc=[%x] inst=[%x] \n",
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst);
+    }
+    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
+        VL_FWRITEF(0x80000002U,"MEM: pc=[%x] inst=[%x] wb_sel=[%1#] wbdata=[%x]\n",
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst,
+                   2,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel),
+                   64,((0U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
+                        ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out
+                        : ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
+                            ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out
+                            : ((1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
+                                ? vlTOPp->io_coreIO_data_read_io_data
+                                : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out))));
+    }
+    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
+        VL_FWRITEF(0x80000002U,"WB : pc=[%x] inst=[%x]\n",
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_134);
+    }
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst;
     vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_603 
         = ((1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_br_type))
             ? ((IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath_io_dat_exe_br_eq)
@@ -680,54 +594,12 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                                                        == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_br_type))
                                                        ? 2U
                                                        : 0U))))))));
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc 
-        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc;
-    VL_EXTEND_WQ(127,64, __Vtemp2, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1);
-    VL_SHIFTL_WWI(127,127,6, __Vtemp3, __Vtemp2, (0x3fU 
-                                                  & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)));
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res 
-        = ((0U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-            ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-               + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
-            : ((1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-                   - vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
-                : ((5U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                    ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-                       & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
-                    : ((6U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                        ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-                           | vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
-                        : ((7U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                            ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-                               ^ vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
-                            : ((8U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                                ? (QData)((IData)(VL_LTS_IQQ(1,64,64, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
-                                : ((9U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                                    ? (QData)((IData)(
-                                                      (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-                                                       < vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
-                                    : ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                                        ? (((QData)((IData)(
-                                                            __Vtemp3[1U])) 
-                                            << 0x20U) 
-                                           | (QData)((IData)(
-                                                             __Vtemp3[0U])))
-                                        : ((4U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                                            ? VL_SHIFTRS_QQI(64,64,6, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1, 
-                                                             (0x3fU 
-                                                              & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
-                                            : ((3U 
-                                                == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                                                ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
-                                                   >> 
-                                                   (0x3fU 
-                                                    & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
-                                                : (
-                                                   (0xaU 
-                                                    == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
-                                                    ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1
-                                                    : 0ULL)))))))))));
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133 
+        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_134 
+        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_134;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc 
+        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
     if (vlTOPp->reset) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_valid = 0U;
     } else {
@@ -736,19 +608,102 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                 = (0U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__ctrl_exe_pc_sel));
         }
     }
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_pc_plus4 
-        = (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc);
-    vlTOPp->io_coreIO_data_read_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
-    vlTOPp->io_coreIO_data_write_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
-    if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
-        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel 
-            = ((0x2003ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
-                ? 1U : (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_361));
-    }
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_wbaddr 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_wbaddr;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_rf_wen 
         = ((~ (IData)(vlTOPp->reset)) & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_rf_wen));
+    vlTOPp->io_diffTestIO_pc = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc;
+    vlTOPp->io_coreIO_inst_read_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_pc_plus4 
+        = (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc);
+    if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
+        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun 
+            = ((0x2003ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                ? 0U : ((3ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                         ? 0U : ((0x4003ULL == (0x707fULL 
+                                                & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                  ? 0U : ((0x1003ULL 
+                                           == (0x707fULL 
+                                               & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                           ? 0U : (
+                                                   (0x5003ULL 
+                                                    == 
+                                                    (0x707fULL 
+                                                     & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                    ? 0U
+                                                    : 
+                                                   ((0x2023ULL 
+                                                     == 
+                                                     (0x707fULL 
+                                                      & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                     ? 0U
+                                                     : 
+                                                    ((0x23ULL 
+                                                      == 
+                                                      (0x707fULL 
+                                                       & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                      ? 0U
+                                                      : 
+                                                     ((0x1023ULL 
+                                                       == 
+                                                       (0x707fULL 
+                                                        & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                       ? 0U
+                                                       : 
+                                                      ((0x17ULL 
+                                                        == 
+                                                        (0x7fULL 
+                                                         & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                        ? 0U
+                                                        : 
+                                                       ((0x37ULL 
+                                                         == 
+                                                         (0x7fULL 
+                                                          & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                         ? 0xbU
+                                                         : 
+                                                        ((0x13ULL 
+                                                          == 
+                                                          (0x707fULL 
+                                                           & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                          ? 0U
+                                                          : 
+                                                         ((0x7013ULL 
+                                                           == 
+                                                           (0x707fULL 
+                                                            & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                           ? 5U
+                                                           : 
+                                                          ((0x6013ULL 
+                                                            == 
+                                                            (0x707fULL 
+                                                             & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                            ? 6U
+                                                            : 
+                                                           ((0x4013ULL 
+                                                             == 
+                                                             (0x707fULL 
+                                                              & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                                                             ? 7U
+                                                             : (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_312)))))))))))))));
+    }
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out 
+        = ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel))
+            ? (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc)
+            : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res);
+    if (vlTOPp->reset) {
+        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst = 0x4033ULL;
+    } else {
+        if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
+            vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_inst 
+                = ((0U != (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__ctrl_exe_pc_sel))
+                    ? 0x4033ULL : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst);
+        }
+    }
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc 
+        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc;
     if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_wbaddr 
             = ((0U != (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__ctrl_exe_pc_sel))
@@ -798,6 +753,59 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                                                             & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst)) 
                                                           | (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_385)))))))))))))));
         }
+    }
+    VL_EXTEND_WQ(127,64, __Vtemp2, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1);
+    VL_SHIFTL_WWI(127,127,6, __Vtemp3, __Vtemp2, (0x3fU 
+                                                  & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)));
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res 
+        = ((0U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+            ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+               + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
+            : ((1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+                   - vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
+                : ((5U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                    ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+                       & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
+                    : ((6U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                        ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+                           | vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
+                        : ((7U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                            ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+                               ^ vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)
+                            : ((8U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                                ? (QData)((IData)(VL_LTS_IQQ(1,64,64, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
+                                : ((9U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                                    ? (QData)((IData)(
+                                                      (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+                                                       < vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
+                                    : ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                                        ? (((QData)((IData)(
+                                                            __Vtemp3[1U])) 
+                                            << 0x20U) 
+                                           | (QData)((IData)(
+                                                             __Vtemp3[0U])))
+                                        : ((4U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                                            ? VL_SHIFTRS_QQI(64,64,6, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1, 
+                                                             (0x3fU 
+                                                              & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
+                                            : ((3U 
+                                                == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                                                ? (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
+                                                   >> 
+                                                   (0x3fU 
+                                                    & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)))
+                                                : (
+                                                   (0xaU 
+                                                    == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
+                                                    ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1
+                                                    : 0ULL)))))))))));
+    vlTOPp->io_coreIO_data_read_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
+    vlTOPp->io_coreIO_data_write_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
+    if ((1U & (~ (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT__stall)))) {
+        vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel 
+            = ((0x2003ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
+                ? 1U : (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_361));
     }
     if (vlTOPp->reset) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst = 0x4033ULL;

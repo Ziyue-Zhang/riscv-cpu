@@ -17,6 +17,14 @@ Emu::Emu(Ram* input_ram, long* input_time)
         emu_simtop->trace(emu_vcd, 99);  
         emu_vcd->open("build/trace/myVCD.vcd");
     }
+
+    for (size_t i = 0; i < 10; i++)
+    {
+        emu_simtop->clock = 0;
+        emu_simtop->eval();
+        emu_simtop->clock = 1;
+        emu_simtop->eval();       
+    }
 }
 
 Emu::~Emu()

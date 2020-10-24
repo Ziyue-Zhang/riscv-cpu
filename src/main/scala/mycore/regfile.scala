@@ -24,13 +24,13 @@ class REGFILE() extends Module
 
    val regfile = Mem(32, UInt(XLEN.W))
 
+   io.rs1_data := Mux((io.rs1_addr =/= 0.U), regfile(io.rs1_addr), 0.U(XLEN.W))
+   io.rs2_data := Mux((io.rs2_addr =/= 0.U), regfile(io.rs2_addr), 0.U(XLEN.W))
+
    when (io.wen.asBool() && (io.waddr =/= 0.U))
    {
       regfile(io.waddr) := io.wdata
    }
-
-   io.rs1_data := Mux((io.rs1_addr =/= 0.U), regfile(io.rs1_addr), 0.U(XLEN.W))
-   io.rs2_data := Mux((io.rs2_addr =/= 0.U), regfile(io.rs2_addr), 0.U(XLEN.W))
    
    BoringUtils.addSource(VecInit((0 to NUM_REG-1).map(i => regfile(i.U))), "diffTestRegfile")
 }

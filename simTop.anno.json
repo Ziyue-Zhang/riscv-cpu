@@ -5,6 +5,10 @@
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
+    "target":"~simTop|dpath>wb_reg_pc"
+  },
+  {
+    "class":"firrtl.transforms.DontTouchAnnotation",
     "target":"~simTop|REGFILE>_T_42_0"
   },
   {

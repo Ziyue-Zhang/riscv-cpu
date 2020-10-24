@@ -127,6 +127,7 @@ VL_MODULE(VsimTop) {
     QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
     QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
     QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs2_data;
+    QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc;
     QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbdata;
     QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__if_pc_plus4;
     QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__if_reg_inst;

@@ -32,9 +32,7 @@ void VsimTop::_initial__TOP__1(VsimTop__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    VsimTop::_initial__TOP__1\n"); );
     VsimTop* const __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    vlTOPp->io_diffTestIO_pc = 0ULL;
-    vlTOPp->io_coreIO_inst_read_io_addr = 0ULL;
-    vlTOPp->io_coreIO_inst_read_io_en = 0U;
+    vlTOPp->io_coreIO_inst_read_io_en = 1U;
     vlTOPp->io_coreIO_data_read_io_en = 1U;
     vlTOPp->io_coreIO_data_write_io_en = 1U;
 }
@@ -120,6 +118,12 @@ void VsimTop::_settle__TOP__3(VsimTop__Syms* __restrict vlSymsp) {
     vlTOPp->simTop__DOT__mycore__DOT__dpath_io_dat_exe_br_ltu 
         = (vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1 
            < vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data);
+    vlTOPp->io_diffTestIO_pc = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc;
+    vlTOPp->io_coreIO_inst_read_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_pc_plus4 
+        = (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc);
+    vlTOPp->io_coreIO_data_read_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
+    vlTOPp->io_coreIO_data_write_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
     VL_EXTEND_WQ(127,64, __Vtemp6, vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1);
     VL_SHIFTL_WWI(127,127,6, __Vtemp7, __Vtemp6, (0x3fU 
                                                   & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__brjmp_offset)));
@@ -166,10 +170,6 @@ void VsimTop::_settle__TOP__3(VsimTop__Syms* __restrict vlSymsp) {
                                                     == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_alu_fun))
                                                     ? vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_alu_op1
                                                     : 0ULL)))))))))));
-    vlTOPp->io_coreIO_data_read_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
-    vlTOPp->io_coreIO_data_write_io_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_pc_plus4 
-        = (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc);
     vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_312 
         = ((0x2013ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
             ? 8U : ((0x3013ULL == (0x707fULL & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
@@ -1191,6 +1191,7 @@ void VsimTop::_ctor_var_reset() {
     simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_rf_wen = VL_RAND_RESET_I(1);
     simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel = VL_RAND_RESET_I(2);
     simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_valid = VL_RAND_RESET_I(1);
+    simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc = VL_RAND_RESET_Q(64);
     simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbaddr = VL_RAND_RESET_I(5);
     simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbdata = VL_RAND_RESET_Q(64);
     simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_ctrl_rf_wen = VL_RAND_RESET_I(1);
