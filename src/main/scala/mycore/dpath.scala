@@ -98,21 +98,25 @@ class dpath extends Module
   val if_pc_next          = Wire(UInt(XLEN.W))
   val exe_brjmp_target    = Wire(UInt(XLEN.W))
   val exe_jump_reg_target = Wire(UInt(XLEN.W))
-
-  val if_pc_plus4 = (if_reg_pc + 4.asUInt(XLEN.W))
-
-
+  
+  when (!io.ctl.dec_stall)
+  {
+      if_reg_pc := if_pc_next
+  }
+  
+  val if_pc_plus4 = if_reg_pc + 4.asUInt(XLEN.W) 
+  
   if_pc_next := Mux(io.ctl.exe_pc_sel === PC_4,      if_pc_plus4,
                 Mux(io.ctl.exe_pc_sel === PC_BRJMP,  exe_brjmp_target,
                 Mux(io.ctl.exe_pc_sel === PC_JALR,   exe_jump_reg_target,
                 BUBBLE))) 
+  
+  io.inst_read_io.addr := if_reg_pc
+  io.inst_read_io.en := true. B
 
   // get inst
   val if_inst = Wire(UInt(XLEN.W))
   val if_reg_inst = Reg(UInt(XLEN.W)) // 缓存
-
-  io.inst_read_io.addr := if_reg_pc
-  io.inst_read_io.en := true. B
 
   when(io.inst_read_io.en){
     if_reg_inst := io.inst_read_io.data
@@ -304,7 +308,7 @@ class dpath extends Module
   // Memory Stage
 
   // WB Mux
-  io.data_read_io.en := true.B
+  io.data_read_io.en := mem_reg_ctrl_mem_val
   io.data_read_io.addr := mem_reg_alu_out.asUInt()
   mem_wbdata := MuxCase(mem_reg_alu_out, Array(
     (mem_reg_ctrl_wb_sel === WB_ALU) -> mem_reg_alu_out,
@@ -338,7 +342,7 @@ class dpath extends Module
   io.dat.exe_br_type:= exe_reg_ctrl_br_type
   
   // datapath to data memory outputs
-  io.data_write_io.en := true.B
+  io.data_write_io.en := mem_reg_ctrl_mem_val
   io.data_write_io.addr := mem_reg_alu_out.asUInt()
   io.data_write_io.data := mem_reg_rs2_data     
 }
