@@ -92,6 +92,6 @@ double Emu::get_time() {
 }
 
 void Emu::emu_eval(){
-    emu_simtop->io_coreIO_inst_read_io_data = 
-        emu_ram->InstRead(emu_simtop->io_coreIO_inst_read_io_addr, emu_simtop->io_coreIO_inst_read_io_en);
+    emu_simtop->io_coreIO_inst_readIO_data = 
+        emu_ram->InstRead(emu_simtop->io_coreIO_inst_readIO_addr, emu_simtop->io_coreIO_inst_readIO_en);
 }

@@ -1,18 +1,14 @@
-package mycore
-
+package njucore
 
 import chisel3._
 import chisel3.util._
-
-
+import common.CSR
 import common.constant._
 import common.instructions._
-import common.CSR
-import common.MemPortIo
 
 class CtlToDatIo extends Bundle()
 {
-   val dec_stall  = Output(Bool())    // stall IF/DEC stages (due to hazards)
+  val dec_stall  = Output(Bool())    // stall IF/DEC stages (due to hazards)
    val exe_pc_sel = Output(UInt(2.W))
    val br_type    = Output(UInt(4.W))
    val if_kill    = Output(Bool())
@@ -28,25 +24,17 @@ class CtlToDatIo extends Bundle()
    val csr_cmd    = Output(UInt(CSR.SZ))
 }
 
-//定义cpath模块的端口
-//Flipped是反转的作用，将DebugCPath()中定义的端口反过来，并在cpath模块中命名为dcpath，即input在这边边ouput
-//dat是在DatToCtlIo()中声明端口的反端口
-//ctl是CtlToDatIo()的调用，CtlToDatIo()在上面已经作了说明，用法是：ctl.exception、ctl.csr_cmd，某些信号在rtl中能找到对应的名字
-class CpathIo() extends Bundle() 
-{
-   val dat  = Flipped(new DatToCtlIo())
-   val ctl  = new CtlToDatIo()
+class CpathIO extends Bundle{
+  val dat = Flipped(new DatToCtlIo())
+  val ctl = new CtlToDatIo()
+
 }
 
-//这个是主体部分                                                                                                                            
-class cpath() extends Module
-{                                                                                                                   
-  //先声明一个io的端口，调用的就是上面的CpathIo()，并赋随机值
-  val io = IO(new CpathIo())
+class Cpath extends Module{
+  val io = IO(new CpathIO())
   io := DontCare
 
-   // ListLookup就是查找表，对输入的数据io.dat.inst进行查找，与指令的操作码进行比较，当符合相应指令时，将相应的控制信号赋给csignals，并不是将指令数据直接赋给控制信号，控制信号是有差异的，BR_N  , OP1_X  ,  OP2_X  , ALU_X   , WB_X   , REN_0, MEN_0, M_X  , MT_X,  CSR.N代表的意义各不相同，具体的控制信号意义可以看consts.scala
-   val csignals =
+  val csignals =
       ListLookup(io.dat.dec_inst,
                              List(N, BR_N  , OP1_X , OP2_X    , OEN_0, OEN_0, ALU_X   , WB_X  ,  REN_0, MEN_0, M_X  , MT_X, CSR.N, N),
                Array(       /* val  |  BR  |  op1  |   op2     |  R1  |  R2  |  ALU    |  wb   | rf   | mem  | mem  | mask | csr | fence.i */
@@ -95,85 +83,85 @@ class cpath() extends Module
                   // we are already sequentially consistent, so no need to honor the fence instruction
                   ))
                   
-   val (cs_val_inst: Bool) :: cs_br_type :: cs_op1_sel :: cs_op2_sel :: (cs_rs1_oen: Bool) :: (cs_rs2_oen: Bool) :: cs0 = csignals
-   val cs_alu_fun :: cs_wb_sel :: (cs_rf_wen: Bool) :: (cs_mem_en: Bool) :: cs_mem_fcn :: cs_msk_sel :: cs_csr_cmd :: (cs_fencei: Bool) :: Nil = cs0
-               
-   // Branch Logic   
-   val ctrl_exe_pc_sel = Mux(false.B                      , PC_EXC,
-                         Mux(io.dat.exe_br_type === BR_N  , PC_4,
-                         Mux(io.dat.exe_br_type === BR_NE , Mux(!io.dat.exe_br_eq,  PC_BRJMP, PC_4),
-                         Mux(io.dat.exe_br_type === BR_EQ , Mux( io.dat.exe_br_eq,  PC_BRJMP, PC_4),
-                         Mux(io.dat.exe_br_type === BR_GE , Mux(!io.dat.exe_br_lt,  PC_BRJMP, PC_4),
-                         Mux(io.dat.exe_br_type === BR_GEU, Mux(!io.dat.exe_br_ltu, PC_BRJMP, PC_4),
-                         Mux(io.dat.exe_br_type === BR_LT , Mux( io.dat.exe_br_lt,  PC_BRJMP, PC_4),
-                         Mux(io.dat.exe_br_type === BR_LTU, Mux( io.dat.exe_br_ltu, PC_BRJMP, PC_4),
-                         Mux(io.dat.exe_br_type === BR_J  , PC_BRJMP,
-                         Mux(io.dat.exe_br_type === BR_JR , PC_JALR,
-                                                            PC_4
+  val (cs_val_inst: Bool) :: cs_br_type :: cs_op1_sel :: cs_op2_sel :: (cs_rs1_oen: Bool) :: (cs_rs2_oen: Bool) :: cs0 = csignals
+  val cs_alu_fun :: cs_wb_sel :: (cs_rf_wen: Bool) :: (cs_mem_en: Bool) :: cs_mem_fcn :: cs_msk_sel :: cs_csr_cmd :: (cs_fencei: Bool) :: Nil = cs0
+
+  // Branch Logic   
+  val ctrl_exe_pc_sel = Mux(false.B                      , PC_EXC,
+                        Mux(io.dat.exe_br_type === BR_N  , PC_4,
+                        Mux(io.dat.exe_br_type === BR_NE , Mux(!io.dat.exe_br_eq,  PC_BRJMP, PC_4),
+                        Mux(io.dat.exe_br_type === BR_EQ , Mux( io.dat.exe_br_eq,  PC_BRJMP, PC_4),
+                        Mux(io.dat.exe_br_type === BR_GE , Mux(!io.dat.exe_br_lt,  PC_BRJMP, PC_4),
+                        Mux(io.dat.exe_br_type === BR_GEU, Mux(!io.dat.exe_br_ltu, PC_BRJMP, PC_4),
+                        Mux(io.dat.exe_br_type === BR_LT , Mux( io.dat.exe_br_lt,  PC_BRJMP, PC_4),
+                        Mux(io.dat.exe_br_type === BR_LTU, Mux( io.dat.exe_br_ltu, PC_BRJMP, PC_4),
+                        Mux(io.dat.exe_br_type === BR_J  , PC_BRJMP,
+                        Mux(io.dat.exe_br_type === BR_JR , PC_JALR,
+                                                           PC_4
                      ))))))))))
 
-   val ifkill  = (ctrl_exe_pc_sel =/= PC_4) 
-   val deckill = (ctrl_exe_pc_sel =/= PC_4)
+  val ifkill  = (ctrl_exe_pc_sel =/= PC_4) 
+  val deckill = (ctrl_exe_pc_sel =/= PC_4)
 
-   val stall   = Wire(Bool())
+  val stall   = Wire(Bool())
 
-   val dec_rs1_addr = io.dat.dec_inst(19, 15)
-   val dec_rs2_addr = io.dat.dec_inst(24, 20)
-   val dec_wbaddr   = io.dat.dec_inst(11, 7)
-   val dec_rs1_oen  = Mux(deckill, false.B, cs_rs1_oen)
-   val dec_rs2_oen  = Mux(deckill, false.B, cs_rs2_oen)
+  val dec_rs1_addr = io.dat.dec_inst(19, 15)
+  val dec_rs2_addr = io.dat.dec_inst(24, 20)
+  val dec_wbaddr   = io.dat.dec_inst(11, 7)
+  val dec_rs1_oen  = Mux(deckill, false.B, cs_rs1_oen)
+  val dec_rs2_oen  = Mux(deckill, false.B, cs_rs2_oen)
 
-   val exe_reg_wbaddr      = Reg(UInt())
-   val mem_reg_wbaddr      = Reg(UInt())
-   val wb_reg_wbaddr       = Reg(UInt())
-   val exe_reg_ctrl_rf_wen = RegInit(false.B)
-   val mem_reg_ctrl_rf_wen = RegInit(false.B)
-   val wb_reg_ctrl_rf_wen  = RegInit(false.B)
-   //val exe_reg_exception   = RegInit(false.B)
+  val exe_reg_wbaddr      = Reg(UInt())
+  val mem_reg_wbaddr      = Reg(UInt())
+  val wb_reg_wbaddr       = Reg(UInt())
+  val exe_reg_ctrl_rf_wen = RegInit(false.B)
+  val mem_reg_ctrl_rf_wen = RegInit(false.B)
+  val wb_reg_ctrl_rf_wen  = RegInit(false.B)
+  //val exe_reg_exception   = RegInit(false.B)
 
-   //val exe_reg_is_csr = RegInit(false.B)
+  //val exe_reg_is_csr = RegInit(false.B)
 
-   // TODO rename stall==hazard_stall full_stall == cmiss_stall
+  // TODO rename stall==hazard_stall full_stall == cmiss_stall
 
-   when (!stall)
-   {
+  when (!stall)
+  {
       when (deckill)
       {
-         exe_reg_wbaddr      := 0.U
-         exe_reg_ctrl_rf_wen := false.B
+          exe_reg_wbaddr      := 0.U
+          exe_reg_ctrl_rf_wen := false.B
       }
       .otherwise
       {
-         exe_reg_wbaddr      := dec_wbaddr
-         exe_reg_ctrl_rf_wen := cs_rf_wen
+          exe_reg_wbaddr      := dec_wbaddr
+          exe_reg_ctrl_rf_wen := cs_rf_wen
       }
-   }
-   .elsewhen (stall)
-   {
+  }
+  .elsewhen (stall)
+  {
       // kill exe stage
       exe_reg_wbaddr      := 0.U
       exe_reg_ctrl_rf_wen := false.B
-   }
+  }
 
-   mem_reg_wbaddr      := exe_reg_wbaddr
-   wb_reg_wbaddr       := mem_reg_wbaddr
-   mem_reg_ctrl_rf_wen := exe_reg_ctrl_rf_wen
-   wb_reg_ctrl_rf_wen  := mem_reg_ctrl_rf_wen
+  mem_reg_wbaddr      := exe_reg_wbaddr
+  wb_reg_wbaddr       := mem_reg_wbaddr
+  mem_reg_ctrl_rf_wen := exe_reg_ctrl_rf_wen
+  wb_reg_ctrl_rf_wen  := mem_reg_ctrl_rf_wen
 
-   val exe_inst_is_load = RegInit(false.B)
+  val exe_inst_is_load = RegInit(false.B)
+  val last_inst_is_jmp = RegInit(false.B)
+  
+  exe_inst_is_load := cs_mem_en && (cs_mem_fcn === M_XRD)
 
-   exe_inst_is_load := cs_mem_en && (cs_mem_fcn === M_XRD)
+  // Stall signal stalls instruction fetch & decode stages,
+  // inserts NOP into execute stage,  and drains execute, memory, and writeback stages
+  // stalls on I$ misses and on hazards
 
-   // Stall signal stalls instruction fetch & decode stages,
-   // inserts NOP into execute stage,  and drains execute, memory, and writeback stages
-   // stalls on I$ misses and on hazards
+  stall := ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs1_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs1_oen) ||
+           ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs2_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs2_oen)
 
-   stall := ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs1_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs1_oen) ||
-            ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs2_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs2_oen)
- 
-   //将指令解码的控制信号分别赋给相应的端口，准备好送给dpath
-   // Set the data-path control signals
-   io.ctl.dec_stall  := stall
+  // Set the data-path control signals
+  io.ctl.dec_stall  := stall
    io.ctl.exe_pc_sel := ctrl_exe_pc_sel
    io.ctl.br_type    := cs_br_type
    io.ctl.if_kill    := ifkill
@@ -188,9 +176,9 @@ class cpath() extends Module
    io.ctl.mem_fcn    := cs_mem_fcn
    io.ctl.mem_typ    := cs_msk_sel
 
-   // convert CSR instructions with raddr1 == 0 to read-only CSR commands
-   val rs1_addr = io.dat.dec_inst(RS1_MSB, RS1_LSB)
-   val csr_ren = (cs_csr_cmd === CSR.S || cs_csr_cmd === CSR.C) && rs1_addr === 0.U
-   io.ctl.csr_cmd := Mux(csr_ren, CSR.R, cs_csr_cmd)
-}
+  val rs1_addr = io.dat.dec_inst(RS1_MSB, RS1_LSB)
+  val csr_ren = (cs_csr_cmd === CSR.S || cs_csr_cmd === CSR.C) && rs1_addr === 0.U
+  io.ctl.csr_cmd := Mux(csr_ren, CSR.R, cs_csr_cmd)
 
+  printf("CTRL : inst = %x, ifkill = %d, deckill = %d, stall = %d\n",io.dat.dec_inst, ifkill, deckill, stall)
+}

@@ -1,25 +1,23 @@
-package mycore
+package njucore
 
 import chisel3._
 import common._
 
-class coreIO extends Bundle{
-  val inst_read_io = new InstReadIO()
-  val data_read_io = new DataReadIO()
-  val data_write_io = new DataWriteIO()
+class njucoreIO extends Bundle{
+  val inst_readIO  = new InstReadIO
+  val data_readIO  = new DataReadIO
+  val data_writeIO = new DataWriteIO
 }
 
-class core extends Module{
-  val io = IO(new coreIO)
-  val cpath = Module(new cpath)
-  val dpath = Module(new dpath)
+class njucore extends Module{
+  val io = IO(new njucoreIO)
+  val cpath = Module(new Cpath)
+  val dpath = Module(new Dpath)
 
-  // 和外部连接
-  io.inst_read_io <> dpath.io.inst_read_io
-  io.data_read_io <> dpath.io.data_read_io
-  io.data_write_io <> dpath.io.data_write_io
+  io.inst_readIO  <> dpath.io.inst_readIO
+  io.data_readIO  <> dpath.io.data_readIO
+  io.data_writeIO <> dpath.io.data_writeIO
 
-  // 两个模块连接
   cpath.io.ctl <> dpath.io.ctl
   cpath.io.dat <> dpath.io.dat
 }
