@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "VsimTop.h"
 #include "verilated_vcd_c.h"
+#include "difftest.h"
 #include <iostream>
 using namespace std;
 #include "difftestIO.h"
@@ -17,7 +18,7 @@ Emu::Emu(Ram* input_ram, long* input_time)
         emu_simtop->trace(emu_vcd, 99);  
         emu_vcd->open("build/trace/myVCD.vcd");
     }
-
+    emu_simtop->reset = 1;
     for (size_t i = 0; i < 10; i++)
     {
         emu_simtop->clock = 0;
@@ -25,6 +26,7 @@ Emu::Emu(Ram* input_ram, long* input_time)
         emu_simtop->clock = 1;
         emu_simtop->eval();       
     }
+    emu_simtop->reset = 0;
 }
 
 Emu::~Emu()
@@ -37,42 +39,27 @@ Emu::~Emu()
 
 void Emu::step(int num)
 {
-    for(int i = num; i > 0; i--){
-        int max_step = 10;      
-        while(!emu_simtop->io_diffTestIO_valid && max_step-- > 0){      
-            cout << "clock = " << emu_cycles << endl;
-            emu_cycles++;
-            emu_simtop->clock = 1;
-            emu_eval();      
-            emu_simtop->eval();
-            (*emu_time)++;
-            if(vcdTrace) {
-                emu_vcd->dump((double)*emu_time);
-            }
-            emu_simtop->clock = 0;
-            emu_simtop->eval();
-            (*emu_time)++;
-            if(vcdTrace) {
-                emu_vcd->dump((double)*emu_time);
-            }        
-        }
-        //now valid
-        cout << "clock = " << emu_cycles << endl;
-        emu_cycles++;
-        emu_simtop->clock = 1;
-        emu_eval();     
-        emu_simtop->eval();
-        (*emu_time)++;
-        if(vcdTrace) {
-            emu_vcd->dump((double)*emu_time);
-        }
+    for(int i = 100; i > 0; i--){
+        printf("cycle = %d \n", emu_cycles);
         emu_simtop->clock = 0;
         emu_simtop->eval();
-        (*emu_time)++;
-        if(vcdTrace) {
-            emu_vcd->dump((double)*emu_time);
+
+        emu_eval();      
+
+        emu_simtop->clock = 1;
+        emu_simtop->eval();
+        if(vcdTrace) 
+            emu_vcd->dump(emu_cycles);
+        emu_cycles++;
+
+        // difftest
+        if(emu_simtop->io_diffTestIO_valid){
+            extern int difftest_step(Emu* emu);
+            int temp = difftest_step(this);
+            assert(temp==0);
+            printf("***************************************\n");
+            return;
         }
-        cout <<"****************************"<< endl;
     }
 }
 
@@ -94,4 +81,10 @@ double Emu::get_time() {
 void Emu::emu_eval(){
     emu_simtop->io_coreIO_inst_readIO_data = 
         emu_ram->InstRead(emu_simtop->io_coreIO_inst_readIO_addr, emu_simtop->io_coreIO_inst_readIO_en);
+    emu_simtop->io_coreIO_data_readIO_data =
+        emu_ram->DataRead(emu_simtop->io_coreIO_data_readIO_addr, emu_simtop->io_coreIO_data_readIO_en);
+    emu_ram->DataWrite( emu_simtop->io_coreIO_data_writeIO_addr,
+        emu_simtop->io_coreIO_data_writeIO_data,
+        emu_simtop->io_coreIO_data_writeIO_en,
+        emu_simtop->io_coreIO_data_writeIO_mask);
 }

@@ -33,6 +33,7 @@ void VsimTop::_initial__TOP__1(VsimTop__Syms* __restrict vlSymsp) {
     VsimTop* const __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
     vlTOPp->io_coreIO_inst_readIO_en = 1U;
+    vlTOPp->io_coreIO_data_readIO_en = 0U;
 }
 
 void VsimTop::_settle__TOP__3(VsimTop__Syms* __restrict vlSymsp) {
@@ -143,7 +144,6 @@ void VsimTop::_settle__TOP__3(VsimTop__Syms* __restrict vlSymsp) {
                         << 0x20U) | (QData)((IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data)))
                     : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data)));
     vlTOPp->io_coreIO_inst_readIO_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc;
-    vlTOPp->io_coreIO_data_readIO_en = (1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn));
     vlTOPp->io_coreIO_data_writeIO_en = (2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn));
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_pc_plus4 
         = (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__if_reg_pc);
@@ -779,7 +779,7 @@ void VsimTop::_settle__TOP__3(VsimTop__Syms* __restrict vlSymsp) {
     vlTOPp->io_coreIO_data_writeIO_data = vlTOPp->simTop__DOT__mycore__DOT__dpath_io_data_writeIO_data;
     vlTOPp->io_coreIO_data_readIO_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res;
     vlTOPp->io_coreIO_data_writeIO_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_157 
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_158 
         = (0x3ffU & ((IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_typ) 
                      << (7U & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res))));
     vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_603 
@@ -1145,7 +1145,7 @@ void VsimTop::_settle__TOP__3(VsimTop__Syms* __restrict vlSymsp) {
                                                               & vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst))
                                                              ? 0U
                                                              : (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_196))))))))))))))));
-    vlTOPp->io_coreIO_data_writeIO_mask = (0xffU & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_157));
+    vlTOPp->io_coreIO_data_writeIO_mask = (0xffU & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_158));
     vlTOPp->simTop__DOT__mycore__DOT__cpath_io_ctl_exe_pc_sel 
         = ((0U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_br_type))
             ? 0U : (IData)(vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_603));
@@ -1455,12 +1455,12 @@ void VsimTop::_ctor_var_reset() {
     simTop__DOT__mycore__DOT__dpath__DOT___T_91 = VL_RAND_RESET_I(1);
     simTop__DOT__mycore__DOT__dpath__DOT___T_93 = VL_RAND_RESET_I(1);
     simTop__DOT__mycore__DOT__dpath__DOT__dec_op2_data = VL_RAND_RESET_Q(64);
-    simTop__DOT__mycore__DOT__dpath__DOT___T_132 = VL_RAND_RESET_Q(64);
-    simTop__DOT__mycore__DOT__dpath__DOT___T_157 = VL_RAND_RESET_I(10);
-    simTop__DOT__mycore__DOT__dpath__DOT___T_162 = VL_RAND_RESET_I(5);
-    simTop__DOT__mycore__DOT__dpath__DOT___T_163 = VL_RAND_RESET_Q(64);
-    simTop__DOT__mycore__DOT__dpath__DOT___T_164 = VL_RAND_RESET_I(5);
-    simTop__DOT__mycore__DOT__dpath__DOT___T_165 = VL_RAND_RESET_Q(64);
+    simTop__DOT__mycore__DOT__dpath__DOT___T_133 = VL_RAND_RESET_Q(64);
+    simTop__DOT__mycore__DOT__dpath__DOT___T_158 = VL_RAND_RESET_I(10);
+    simTop__DOT__mycore__DOT__dpath__DOT___T_163 = VL_RAND_RESET_I(5);
+    simTop__DOT__mycore__DOT__dpath__DOT___T_164 = VL_RAND_RESET_Q(64);
+    simTop__DOT__mycore__DOT__dpath__DOT___T_165 = VL_RAND_RESET_I(5);
+    simTop__DOT__mycore__DOT__dpath__DOT___T_166 = VL_RAND_RESET_Q(64);
     { int __Vi0=0; for (; __Vi0<32; ++__Vi0) {
             simTop__DOT__mycore__DOT__dpath__DOT__regfile__DOT__regfile[__Vi0] = VL_RAND_RESET_Q(64);
     }}

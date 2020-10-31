@@ -862,7 +862,6 @@ module Dpath(
   output        io_inst_readIO_en,
   output [63:0] io_data_readIO_addr,
   input  [63:0] io_data_readIO_data,
-  output        io_data_readIO_en,
   output [63:0] io_data_writeIO_addr,
   output [63:0] io_data_writeIO_data,
   output        io_data_writeIO_en,
@@ -1083,8 +1082,8 @@ module Dpath(
   wire  _T_67 = _T_65 & _T_58; // @[dpath.scala 190:39]
   wire  _T_68 = _T_67 & wb_reg_ctrl_rf_wen; // @[dpath.scala 190:65]
   wire [63:0] _T_69 = _T_68 ? wb_reg_wbdata : regfile_io_rs1_data; // @[Mux.scala 98:16]
-  wire  _T_128 = mem_reg_ctrl_wb_sel == 2'h1; // @[dpath.scala 319:26]
-  wire [63:0] mem_wbdata = _T_128 ? mem_reg_dram_data : mem_reg_alu_out; // @[Mux.scala 98:16]
+  wire  _T_129 = mem_reg_ctrl_wb_sel == 2'h1; // @[dpath.scala 320:26]
+  wire [63:0] mem_wbdata = _T_129 ? mem_reg_dram_data : mem_reg_alu_out; // @[Mux.scala 98:16]
   wire [63:0] _T_70 = _T_64 ? mem_wbdata : _T_69; // @[Mux.scala 98:16]
   wire [63:0] exe_alu_out = alu_io_res; // @[dpath.scala 177:26 dpath.scala 275:15]
   wire [63:0] dec_rs1_data = _T_60 ? exe_alu_out : _T_70; // @[Mux.scala 98:16]
@@ -1110,21 +1109,22 @@ module Dpath(
   wire [63:0] dec_op2_data = _T_81 ? exe_alu_out : _T_95; // @[Mux.scala 98:16]
   wire [63:0] exe_pc_plus4 = exe_reg_pc + 64'h4; // @[dpath.scala 283:34]
   wire  _T_121 = exe_reg_ctrl_wb_sel == 2'h2; // @[dpath.scala 289:28]
-  reg [63:0] _T_132; // @[dpath.scala 334:119]
-  wire  _T_140 = exe_reg_ctrl_mem_typ == 3'h1; // @[dpath.scala 347:27]
-  wire [63:0] _T_144 = {exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0]}; // @[Cat.scala 29:58]
-  wire  _T_145 = exe_reg_ctrl_mem_typ == 3'h2; // @[dpath.scala 348:27]
-  wire [63:0] _T_148 = {exe_reg_rs2_data[15:0],exe_reg_rs2_data[15:0],exe_reg_rs2_data[15:0],exe_reg_rs2_data[15:0]}; // @[Cat.scala 29:58]
-  wire  _T_149 = exe_reg_ctrl_mem_typ == 3'h3; // @[dpath.scala 349:27]
-  wire [63:0] _T_151 = {exe_reg_rs2_data[31:0],exe_reg_rs2_data[31:0]}; // @[Cat.scala 29:58]
-  wire [63:0] _T_154 = _T_149 ? _T_151 : exe_reg_rs2_data; // @[Mux.scala 98:16]
-  wire [63:0] _T_155 = _T_145 ? _T_148 : _T_154; // @[Mux.scala 98:16]
-  wire [9:0] _GEN_51 = {{7'd0}, exe_reg_ctrl_mem_typ}; // @[dpath.scala 353:38]
-  wire [9:0] _T_157 = _GEN_51 << exe_alu_out[2:0]; // @[dpath.scala 353:38]
-  reg [4:0] _T_162; // @[dpath.scala 366:12]
-  reg [63:0] _T_163; // @[dpath.scala 367:12]
-  reg [4:0] _T_164; // @[dpath.scala 368:12]
-  reg [63:0] _T_165; // @[dpath.scala 369:12]
+  wire  temp = exe_reg_ctrl_mem_fcn == 2'h1; // @[dpath.scala 311:35]
+  reg [63:0] _T_133; // @[dpath.scala 335:119]
+  wire  _T_141 = exe_reg_ctrl_mem_typ == 3'h1; // @[dpath.scala 348:27]
+  wire [63:0] _T_145 = {exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0],exe_reg_rs2_data[7:0]}; // @[Cat.scala 29:58]
+  wire  _T_146 = exe_reg_ctrl_mem_typ == 3'h2; // @[dpath.scala 349:27]
+  wire [63:0] _T_149 = {exe_reg_rs2_data[15:0],exe_reg_rs2_data[15:0],exe_reg_rs2_data[15:0],exe_reg_rs2_data[15:0]}; // @[Cat.scala 29:58]
+  wire  _T_150 = exe_reg_ctrl_mem_typ == 3'h3; // @[dpath.scala 350:27]
+  wire [63:0] _T_152 = {exe_reg_rs2_data[31:0],exe_reg_rs2_data[31:0]}; // @[Cat.scala 29:58]
+  wire [63:0] _T_155 = _T_150 ? _T_152 : exe_reg_rs2_data; // @[Mux.scala 98:16]
+  wire [63:0] _T_156 = _T_146 ? _T_149 : _T_155; // @[Mux.scala 98:16]
+  wire [9:0] _GEN_51 = {{7'd0}, exe_reg_ctrl_mem_typ}; // @[dpath.scala 354:38]
+  wire [9:0] _T_158 = _GEN_51 << exe_alu_out[2:0]; // @[dpath.scala 354:38]
+  reg [4:0] _T_163; // @[dpath.scala 367:12]
+  reg [63:0] _T_164; // @[dpath.scala 368:12]
+  reg [4:0] _T_165; // @[dpath.scala 369:12]
+  reg [63:0] _T_166; // @[dpath.scala 370:12]
   regfile regfile ( // @[dpath.scala 141:23]
     .clock(regfile_clock),
     .reset(regfile_reset),
@@ -1176,19 +1176,18 @@ module Dpath(
     .io_op(alu_io_op),
     .io_res(alu_io_res)
   );
-  assign io_dat_dec_inst = dec_reg_inst; // @[dpath.scala 340:21]
-  assign io_dat_exe_br_eq = exe_alu_op1 == exe_reg_rs2_data; // @[dpath.scala 341:21]
-  assign io_dat_exe_br_lt = $signed(exe_alu_op1) < $signed(exe_reg_rs2_data); // @[dpath.scala 342:21]
-  assign io_dat_exe_br_ltu = exe_alu_op1 < exe_reg_rs2_data; // @[dpath.scala 343:21]
-  assign io_dat_exe_br_type = exe_reg_ctrl_br_type; // @[dpath.scala 344:21]
+  assign io_dat_dec_inst = dec_reg_inst; // @[dpath.scala 341:21]
+  assign io_dat_exe_br_eq = exe_alu_op1 == exe_reg_rs2_data; // @[dpath.scala 342:21]
+  assign io_dat_exe_br_lt = $signed(exe_alu_op1) < $signed(exe_reg_rs2_data); // @[dpath.scala 343:21]
+  assign io_dat_exe_br_ltu = exe_alu_op1 < exe_reg_rs2_data; // @[dpath.scala 344:21]
+  assign io_dat_exe_br_type = exe_reg_ctrl_br_type; // @[dpath.scala 345:21]
   assign io_inst_readIO_addr = if_reg_pc; // @[dpath.scala 107:23]
   assign io_inst_readIO_en = 1'h1; // @[dpath.scala 108:21]
-  assign io_data_readIO_addr = alu_io_res; // @[dpath.scala 313:24]
-  assign io_data_readIO_en = exe_reg_ctrl_mem_fcn == 2'h1; // @[dpath.scala 312:24]
-  assign io_data_writeIO_addr = alu_io_res; // @[dpath.scala 356:24]
-  assign io_data_writeIO_data = _T_140 ? _T_144 : _T_155; // @[dpath.scala 357:24]
-  assign io_data_writeIO_en = exe_reg_ctrl_mem_fcn == 2'h2; // @[dpath.scala 355:24]
-  assign io_data_writeIO_mask = _T_157[7:0]; // @[dpath.scala 358:24]
+  assign io_data_readIO_addr = alu_io_res; // @[dpath.scala 314:24]
+  assign io_data_writeIO_addr = alu_io_res; // @[dpath.scala 357:24]
+  assign io_data_writeIO_data = _T_141 ? _T_145 : _T_156; // @[dpath.scala 358:24]
+  assign io_data_writeIO_en = exe_reg_ctrl_mem_fcn == 2'h2; // @[dpath.scala 356:24]
+  assign io_data_writeIO_mask = _T_158[7:0]; // @[dpath.scala 359:24]
   assign wb_reg_valid_0 = wb_reg_valid;
   assign _T_42_0_0 = regfile__T_42_0_0;
   assign _T_42_0_1 = regfile__T_42_0_1;
@@ -1345,15 +1344,15 @@ initial begin
   _RAND_36 = {1{`RANDOM}};
   wb_reg_ctrl_rf_wen = _RAND_36[0:0];
   _RAND_37 = {2{`RANDOM}};
-  _T_132 = _RAND_37[63:0];
+  _T_133 = _RAND_37[63:0];
   _RAND_38 = {1{`RANDOM}};
-  _T_162 = _RAND_38[4:0];
+  _T_163 = _RAND_38[4:0];
   _RAND_39 = {2{`RANDOM}};
-  _T_163 = _RAND_39[63:0];
+  _T_164 = _RAND_39[63:0];
   _RAND_40 = {1{`RANDOM}};
-  _T_164 = _RAND_40[4:0];
+  _T_165 = _RAND_40[4:0];
   _RAND_41 = {2{`RANDOM}};
-  _T_165 = _RAND_41[63:0];
+  _T_166 = _RAND_41[63:0];
 `endif // RANDOMIZE_REG_INIT
   `endif // RANDOMIZE
 end // initial
@@ -1455,7 +1454,7 @@ end // initial
         end else if (_T_60) begin
           exe_alu_op1 <= exe_alu_out;
         end else if (_T_64) begin
-          if (_T_128) begin
+          if (_T_129) begin
             exe_alu_op1 <= mem_reg_dram_data;
           end else begin
             exe_alu_op1 <= mem_reg_alu_out;
@@ -1472,7 +1471,7 @@ end // initial
         if (_T_81) begin
           brjmp_offset <= exe_alu_out;
         end else if (_T_87) begin
-          if (_T_128) begin
+          if (_T_129) begin
             brjmp_offset <= mem_reg_dram_data;
           end else begin
             brjmp_offset <= mem_reg_alu_out;
@@ -1501,7 +1500,7 @@ end // initial
         if (_T_79) begin
           exe_reg_rs2_data <= exe_alu_out;
         end else if (_T_85) begin
-          if (_T_128) begin
+          if (_T_129) begin
             exe_reg_rs2_data <= mem_reg_dram_data;
           end else begin
             exe_reg_rs2_data <= mem_reg_alu_out;
@@ -1601,7 +1600,7 @@ end // initial
     wb_reg_pc <= mem_reg_pc;
     wb_reg_inst <= mem_reg_inst;
     wb_reg_wbaddr <= mem_reg_wbaddr;
-    if (_T_128) begin
+    if (_T_129) begin
       wb_reg_wbdata <= mem_reg_dram_data;
     end else begin
       wb_reg_wbdata <= mem_reg_alu_out;
@@ -1611,11 +1610,11 @@ end // initial
     end else begin
       wb_reg_ctrl_rf_wen <= mem_reg_ctrl_rf_wen;
     end
-    _T_132 <= mem_reg_inst;
-    _T_162 <= mem_reg_rs1_addr;
-    _T_163 <= mem_reg_op1_data;
-    _T_164 <= mem_reg_rs2_addr;
-    _T_165 <= mem_reg_op2_data;
+    _T_133 <= mem_reg_inst;
+    _T_163 <= mem_reg_rs1_addr;
+    _T_164 <= mem_reg_op1_data;
+    _T_165 <= mem_reg_rs2_addr;
+    _T_166 <= mem_reg_op2_data;
     `ifndef SYNTHESIS
     `ifdef PRINTF_COND
       if (`PRINTF_COND) begin
@@ -1654,7 +1653,7 @@ end // initial
       if (`PRINTF_COND) begin
     `endif
         if (_T_10) begin
-          $fwrite(32'h80000002,"MEM read data = [%x]\n",mem_reg_dram_data); // @[dpath.scala 315:9]
+          $fwrite(32'h80000002,"read en %d\n",temp); // @[dpath.scala 312:9]
         end
     `ifdef PRINTF_COND
       end
@@ -1665,7 +1664,7 @@ end // initial
       if (`PRINTF_COND) begin
     `endif
         if (_T_10) begin
-          $fwrite(32'h80000002,"MEM: valid = %d pc=[%x] inst=[%x] wb_sel=[%d] wbdata=[%x]\n",mem_reg_valid,mem_reg_pc,mem_reg_inst,mem_reg_ctrl_wb_sel,mem_wbdata); // @[dpath.scala 322:9]
+          $fwrite(32'h80000002,"MEM read data = [%x]\n",mem_reg_dram_data); // @[dpath.scala 316:9]
         end
     `ifdef PRINTF_COND
       end
@@ -1676,7 +1675,7 @@ end // initial
       if (`PRINTF_COND) begin
     `endif
         if (_T_10) begin
-          $fwrite(32'h80000002,"WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n",wb_reg_valid,wb_reg_pc,_T_132,wb_reg_wbdata,wb_reg_wbaddr); // @[dpath.scala 334:9]
+          $fwrite(32'h80000002,"MEM: valid = %d pc=[%x] inst=[%x] wb_sel=[%d] wbdata=[%x]\n",mem_reg_valid,mem_reg_pc,mem_reg_inst,mem_reg_ctrl_wb_sel,mem_wbdata); // @[dpath.scala 323:9]
         end
     `ifdef PRINTF_COND
       end
@@ -1687,7 +1686,7 @@ end // initial
       if (`PRINTF_COND) begin
     `endif
         if (_T_10) begin
-          $fwrite(32'h80000002,"store:addr = [%x] en=%d data = [%x] mask = %b\n ",io_data_writeIO_addr,io_data_writeIO_en,io_data_writeIO_data,io_data_writeIO_mask); // @[dpath.scala 359:9]
+          $fwrite(32'h80000002,"WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n",wb_reg_valid,wb_reg_pc,_T_133,wb_reg_wbdata,wb_reg_wbaddr); // @[dpath.scala 335:9]
         end
     `ifdef PRINTF_COND
       end
@@ -1698,7 +1697,18 @@ end // initial
       if (`PRINTF_COND) begin
     `endif
         if (_T_10) begin
-          $fwrite(32'h80000002,"pc=[%x] W[r%d=%x][%d] Op1=[r%d][%x] Op2=[r%d][%x] inst=[%x]\n\n",wb_reg_pc,wb_reg_wbaddr,wb_reg_wbdata,wb_reg_ctrl_rf_wen,_T_162,_T_163,_T_164,_T_165,wb_reg_inst); // @[dpath.scala 361:9]
+          $fwrite(32'h80000002,"store:addr = [%x] en=%d data = [%x] mask = %b\n ",io_data_writeIO_addr,io_data_writeIO_en,io_data_writeIO_data,io_data_writeIO_mask); // @[dpath.scala 360:9]
+        end
+    `ifdef PRINTF_COND
+      end
+    `endif
+    `endif // SYNTHESIS
+    `ifndef SYNTHESIS
+    `ifdef PRINTF_COND
+      if (`PRINTF_COND) begin
+    `endif
+        if (_T_10) begin
+          $fwrite(32'h80000002,"pc=[%x] W[r%d=%x][%d] Op1=[r%d][%x] Op2=[r%d][%x] inst=[%x]\n\n",wb_reg_pc,wb_reg_wbaddr,wb_reg_wbdata,wb_reg_ctrl_rf_wen,_T_163,_T_164,_T_165,_T_166,wb_reg_inst); // @[dpath.scala 362:9]
         end
     `ifdef PRINTF_COND
       end
@@ -1713,7 +1723,6 @@ module njucore(
   input  [63:0] io_inst_readIO_data,
   output [63:0] io_data_readIO_addr,
   input  [63:0] io_data_readIO_data,
-  output        io_data_readIO_en,
   output [63:0] io_data_writeIO_addr,
   output [63:0] io_data_writeIO_data,
   output        io_data_writeIO_en,
@@ -1796,7 +1805,6 @@ module njucore(
   wire  dpath_io_inst_readIO_en; // @[core.scala 15:21]
   wire [63:0] dpath_io_data_readIO_addr; // @[core.scala 15:21]
   wire [63:0] dpath_io_data_readIO_data; // @[core.scala 15:21]
-  wire  dpath_io_data_readIO_en; // @[core.scala 15:21]
   wire [63:0] dpath_io_data_writeIO_addr; // @[core.scala 15:21]
   wire [63:0] dpath_io_data_writeIO_data; // @[core.scala 15:21]
   wire  dpath_io_data_writeIO_en; // @[core.scala 15:21]
@@ -1881,7 +1889,6 @@ module njucore(
     .io_inst_readIO_en(dpath_io_inst_readIO_en),
     .io_data_readIO_addr(dpath_io_data_readIO_addr),
     .io_data_readIO_data(dpath_io_data_readIO_data),
-    .io_data_readIO_en(dpath_io_data_readIO_en),
     .io_data_writeIO_addr(dpath_io_data_writeIO_addr),
     .io_data_writeIO_data(dpath_io_data_writeIO_data),
     .io_data_writeIO_en(dpath_io_data_writeIO_en),
@@ -1923,7 +1930,6 @@ module njucore(
   );
   assign io_inst_readIO_addr = dpath_io_inst_readIO_addr; // @[core.scala 17:19]
   assign io_data_readIO_addr = dpath_io_data_readIO_addr; // @[core.scala 18:19]
-  assign io_data_readIO_en = dpath_io_data_readIO_en; // @[core.scala 18:19]
   assign io_data_writeIO_addr = dpath_io_data_writeIO_addr; // @[core.scala 19:19]
   assign io_data_writeIO_data = dpath_io_data_writeIO_data; // @[core.scala 19:19]
   assign io_data_writeIO_en = dpath_io_data_writeIO_en; // @[core.scala 19:19]
@@ -2040,7 +2046,6 @@ module simTop(
   wire [63:0] mycore_io_inst_readIO_data; // @[simTop.scala 15:22]
   wire [63:0] mycore_io_data_readIO_addr; // @[simTop.scala 15:22]
   wire [63:0] mycore_io_data_readIO_data; // @[simTop.scala 15:22]
-  wire  mycore_io_data_readIO_en; // @[simTop.scala 15:22]
   wire [63:0] mycore_io_data_writeIO_addr; // @[simTop.scala 15:22]
   wire [63:0] mycore_io_data_writeIO_data; // @[simTop.scala 15:22]
   wire  mycore_io_data_writeIO_en; // @[simTop.scala 15:22]
@@ -2086,7 +2091,6 @@ module simTop(
     .io_inst_readIO_data(mycore_io_inst_readIO_data),
     .io_data_readIO_addr(mycore_io_data_readIO_addr),
     .io_data_readIO_data(mycore_io_data_readIO_data),
-    .io_data_readIO_en(mycore_io_data_readIO_en),
     .io_data_writeIO_addr(mycore_io_data_writeIO_addr),
     .io_data_writeIO_data(mycore_io_data_writeIO_data),
     .io_data_writeIO_en(mycore_io_data_writeIO_en),
@@ -2163,7 +2167,7 @@ module simTop(
   assign io_coreIO_inst_readIO_addr = mycore_io_inst_readIO_addr; // @[simTop.scala 19:13]
   assign io_coreIO_inst_readIO_en = 1'h1; // @[simTop.scala 19:13]
   assign io_coreIO_data_readIO_addr = mycore_io_data_readIO_addr; // @[simTop.scala 19:13]
-  assign io_coreIO_data_readIO_en = mycore_io_data_readIO_en; // @[simTop.scala 19:13]
+  assign io_coreIO_data_readIO_en = 1'h0; // @[simTop.scala 19:13]
   assign io_coreIO_data_writeIO_addr = mycore_io_data_writeIO_addr; // @[simTop.scala 19:13]
   assign io_coreIO_data_writeIO_data = mycore_io_data_writeIO_data; // @[simTop.scala 19:13]
   assign io_coreIO_data_writeIO_en = mycore_io_data_writeIO_en; // @[simTop.scala 19:13]

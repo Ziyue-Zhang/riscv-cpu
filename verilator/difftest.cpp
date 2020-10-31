@@ -65,21 +65,15 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
     }*/
 }
 
-void difftest_step(Emu* emu) {
+int difftest_step(Emu* emu) {
     reg_t reg_dut[33];
     reg_t reg_ref[NUM_REG+7];
     reg_t temp=0;
-    for(int i=10000; i>0; i--) {
-        emu->step(1);
+    //for(int i=10000; i>0; i--) {
+        //emu->step(1);
         emu->emu_difftest_getregs(reg_dut);
-        ref_difftest_exec(1);
+        
         ref_difftest_getregs(&reg_ref);
-        if(temp==reg_ref[32]){
-            return;
-        }
-        else{
-            temp=reg_ref[32];
-        }
         ref_isa_reg_display();
         bool flag = false;
         for (int i = 0; i < 32; i++) {
@@ -94,7 +88,9 @@ void difftest_step(Emu* emu) {
             flag=true;
         }
         if(flag){
-            return;
+            return -1;
         }
-    }
+        ref_difftest_exec(1);
+    //}
+    return 0;
 }

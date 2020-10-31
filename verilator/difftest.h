@@ -6,7 +6,7 @@
 #include "emu.h"
 
 void init_difftest(reg_t *reg, char* imgPath, Ram* ram);
-void difftest_step(Emu* emu);
+int difftest_step(Emu* emu);
 
 
 static const char *reg_name[NUM_REG+1] = {

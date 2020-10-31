@@ -31,7 +31,7 @@ void VsimTop::eval_step() {
             Verilated::debug(1);
             __Vchange = _change_request(vlSymsp);
             Verilated::debug(__Vsaved_debug);
-            VL_FATAL_MT("simTop.v", 1989, "",
+            VL_FATAL_MT("simTop.v", 1995, "",
                 "Verilated model didn't converge\n"
                 "- See DIDNOTCONVERGE in the Verilator manual");
         } else {
@@ -57,7 +57,7 @@ void VsimTop::_eval_initial_loop(VsimTop__Syms* __restrict vlSymsp) {
             Verilated::debug(1);
             __Vchange = _change_request(vlSymsp);
             Verilated::debug(__Vsaved_debug);
-            VL_FATAL_MT("simTop.v", 1989, "",
+            VL_FATAL_MT("simTop.v", 1995, "",
                 "Verilated model didn't DC converge\n"
                 "- See DIDNOTCONVERGE in the Verilator manual");
         } else {
@@ -83,7 +83,7 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
     QData/*63:0*/ __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
     QData/*63:0*/ __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc;
     QData/*63:0*/ __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst;
-    QData/*63:0*/ __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_132;
+    QData/*63:0*/ __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133;
     QData/*63:0*/ __Vdlyvval__simTop__DOT__mycore__DOT__dpath__DOT__regfile__DOT__regfile__v0;
     // Body
     if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
@@ -113,8 +113,8 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbdata,
                    1,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_ctrl_rf_wen));
     }
-    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_132 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_132;
+    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133;
     __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst;
     __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst 
@@ -367,7 +367,7 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc;
     __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
-    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_132 
+    __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
     if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
         VL_FWRITEF(0x80000002U,"IF : pc=[%x] inst=[%x] if_pc_next=[%x] en=1 pc_sel=[%1#] e_bj_pc=[%x]\n",
@@ -399,8 +399,8 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_brjmp_target);
     }
     if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
-        VL_FWRITEF(0x80000002U,"MEM read data = [%x]\n",
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_dram_data);
+        VL_FWRITEF(0x80000002U,"read en %1#\n",1,(1U 
+                                                  == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn)));
     }
     if (vlTOPp->reset) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_pc = 0ULL;
@@ -411,12 +411,8 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         }
     }
     if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
-        VL_FWRITEF(0x80000002U,"MEM: valid = %1# pc=[%x] inst=[%x] wb_sel=[%1#] wbdata=[%x]\n",
-                   1,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_valid,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst,
-                   2,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel),
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_wbdata);
+        VL_FWRITEF(0x80000002U,"MEM read data = [%x]\n",
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_dram_data);
     }
     if (vlTOPp->reset) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_valid = 0U;
@@ -445,10 +441,18 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         }
     }
     if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
+        VL_FWRITEF(0x80000002U,"MEM: valid = %1# pc=[%x] inst=[%x] wb_sel=[%1#] wbdata=[%x]\n",
+                   1,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_valid,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_pc,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst,
+                   2,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel),
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_wbdata);
+    }
+    if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
         VL_FWRITEF(0x80000002U,"WB : valid = %1# pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%2#]\n",
                    1,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_valid,
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_132,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133,
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbdata,
                    5,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbaddr));
     }
@@ -457,7 +461,7 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res,
                    1,(2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn)),
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath_io_data_writeIO_data,
-                   8,(0xffU & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_157)));
+                   8,(0xffU & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_158)));
     }
     if (VL_UNLIKELY((1U & (~ (IData)(vlTOPp->reset))))) {
         VL_FWRITEF(0x80000002U,"pc=[%x] W[r%2#=%x][%1#] Op1=[r%2#][%x] Op2=[r%2#][%x] inst=[%x]\n\n",
@@ -465,10 +469,10 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                    5,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbaddr),
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbdata,
                    1,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_ctrl_rf_wen),
-                   5,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_162,
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_163,
-                   5,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_164),
-                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_165,
+                   5,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_163,
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_164,
+                   5,(IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_165),
+                   64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_166,
                    64,vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst);
     }
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_wbdata 
@@ -560,8 +564,8 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_inst;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst 
         = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_inst;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_132 
-        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_132;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_133 
+        = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT___T_133;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_valid 
         = __Vdly__simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_valid;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc 
@@ -632,7 +636,7 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         [0x1fU];
     vlTOPp->io_diffTestIO_valid = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_valid;
     vlTOPp->io_diffTestIO_pc = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__wb_reg_pc;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_165 
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_166 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_op2_data;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_dram_data 
         = ((IData)(vlTOPp->reset) ? 0ULL : vlTOPp->io_coreIO_data_readIO_data);
@@ -692,14 +696,12 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                     ? (((QData)((IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data)) 
                         << 0x20U) | (QData)((IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data)))
                     : vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_data)));
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_163 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_op1_data;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_162 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs1_addr;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_164 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_op1_data;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_163 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs1_addr;
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_165 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs2_addr;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel 
-        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel;
     if (vlTOPp->reset) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn = 0U;
     } else {
@@ -715,6 +717,8 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
             }
         }
     }
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel 
+        = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_alu_out 
         = ((2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_wb_sel))
             ? (4ULL + vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_pc)
@@ -737,7 +741,6 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs1_addr;
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_rs2_addr 
         = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_rs2_addr;
-    vlTOPp->io_coreIO_data_readIO_en = (1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn));
     vlTOPp->io_coreIO_data_writeIO_en = (2U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_fcn));
     vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_wbdata 
         = ((1U == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__mem_reg_ctrl_wb_sel))
@@ -900,7 +903,7 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
     }
     vlTOPp->io_coreIO_data_readIO_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res;
     vlTOPp->io_coreIO_data_writeIO_addr = vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res;
-    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_157 
+    vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_158 
         = (0x3ffU & ((IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_mem_typ) 
                      << (7U & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__alu_io_res))));
     vlTOPp->simTop__DOT__mycore__DOT__cpath__DOT___T_603 
@@ -944,7 +947,7 @@ VL_INLINE_OPT void VsimTop::_sequent__TOP__2(VsimTop__Syms* __restrict vlSymsp) 
                                                        == (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__exe_reg_ctrl_br_type))
                                                        ? 2U
                                                        : 0U))))))));
-    vlTOPp->io_coreIO_data_writeIO_mask = (0xffU & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_157));
+    vlTOPp->io_coreIO_data_writeIO_mask = (0xffU & (IData)(vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT___T_158));
     if (vlTOPp->reset) {
         vlTOPp->simTop__DOT__mycore__DOT__dpath__DOT__dec_reg_inst = 0x4033ULL;
     } else {

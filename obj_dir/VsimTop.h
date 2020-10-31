@@ -128,9 +128,9 @@ VL_MODULE(VsimTop) {
         CData/*0:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_87;
         CData/*0:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_91;
         CData/*0:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_93;
-        CData/*4:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_162;
-        CData/*4:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_164;
-        SData/*9:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_157;
+        CData/*4:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_163;
+        CData/*4:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_165;
+        SData/*9:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_158;
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath_io_data_writeIO_data;
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__regfile_io_rs1_data;
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__regfile_io_rs2_data;
@@ -166,9 +166,9 @@ VL_MODULE(VsimTop) {
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__mem_wbdata;
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__dec_op1_data;
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__dec_op2_data;
-        QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_132;
-        QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_163;
-        QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_165;
+        QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_133;
+        QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_164;
+        QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT___T_166;
         QData/*63:0*/ simTop__DOT__mycore__DOT__dpath__DOT__regfile__DOT__regfile[32];
     };
     

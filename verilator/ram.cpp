@@ -46,6 +46,9 @@ int Ram::get_img_size()
 
 inst_t Ram::InstRead(inst_t addr, bool en)
 {
+  if(!en){
+    return 0;
+  }
   printf("inst read addr = 0x%016lx \n", addr);
   assert(ADDR_START <= addr &&
         addr <= ADDR_START + ram_size &&
@@ -55,6 +58,9 @@ inst_t Ram::InstRead(inst_t addr, bool en)
 
 reg_t Ram::DataRead(reg_t addr, bool en)
 {
+  if(!en){
+    return 0;
+  }
   printf("data addr = 0x%016lx \n", addr);
     assert(ADDR_START <= addr &&
         addr <= ADDR_START + ram_size &&
@@ -64,6 +70,9 @@ reg_t Ram::DataRead(reg_t addr, bool en)
 
 void Ram::DataWrite(reg_t addr, reg_t data, bool en, mask_t mask)
 {
+  if(!en){
+    return;
+  }
   assert(ADDR_START <= addr &&
         addr <= ADDR_START + ram_size &&
         "write data addr out of range");

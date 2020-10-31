@@ -308,7 +308,8 @@ class Dpath extends Module {
  
   //******************************************************************************************************
   // Memory Stage
-
+  val temp = exe_reg_ctrl_mem_fcn === M_XRD
+  printf("read en %d\n",temp)
   io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
   io.data_readIO.addr  := exe_alu_out.asUInt()
   mem_reg_dram_data    := io.data_readIO.data
