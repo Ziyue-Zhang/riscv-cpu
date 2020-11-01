@@ -112,18 +112,24 @@ trait RiscvConstants {
 }
 
 trait MemoryOpConstants {
-   val MT_X  = 0.asUInt(3.W)
-   val MT_B  = 1.asUInt(3.W)
-   val MT_H  = 2.asUInt(3.W)
-   val MT_W  = 3.asUInt(3.W)
-   val MT_D  = 4.asUInt(3.W)
-   val MT_BU = 5.asUInt(3.W)
-   val MT_HU = 6.asUInt(3.W)
-   val MT_WU = 7.asUInt(3.W)
+   val MT_X  = 255.asUInt(8.W)
+   val MT_B  = 1.asUInt(8.W)
+   val MT_H  = 3.asUInt(8.W)
+   val MT_W  = 15.asUInt(8.W)
+   val MT_D  = 255.asUInt(8.W)
 
    val M_X   = 0.asUInt(2.W)
    val M_XRD = 1.asUInt(2.W) // int load
    val M_XWR = 2.asUInt(2.W) // int store
+
+   val MEX_B  = 0.asUInt(3.W)
+   val MEX_BU = 1.asUInt(3.W)
+   val MEX_H  = 2.asUInt(3.W)
+   val MEX_HU = 3.asUInt(3.W)
+   val MEX_W  = 4.asUInt(3.W)
+   val MEX_WU = 5.asUInt(3.W)
+   val MEX_D  = 6.asUInt(3.W)
+   val MEX_X  = 0.asUInt(3.W)
 }
 
 object CSR

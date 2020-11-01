@@ -55,6 +55,7 @@ class Dpath extends Module {
   val exe_reg_ctrl_mem_val  = RegInit(false.B)
   val exe_reg_ctrl_mem_fcn  = RegInit(M_X)
   val exe_reg_ctrl_mem_typ  = RegInit(MT_X)
+  val exe_reg_ctrl_mem_ext = RegInit(MEX_X)
   val exe_reg_ctrl_csr_cmd = RegInit(CSR.N)
 
   // Memory State
@@ -73,6 +74,7 @@ class Dpath extends Module {
   val mem_reg_ctrl_mem_fcn  = RegInit(M_X)
   val mem_reg_ctrl_mem_typ  = RegInit(MT_X)
   val mem_reg_ctrl_wb_sel = Reg(UInt())
+  val mem_reg_ctrl_mem_ext = RegInit(MEX_X)
   val mem_reg_ctrl_csr_cmd = RegInit(CSR.N)
   val mem_reg_dram_data = RegInit(0.asUInt(XLEN.W))
 
@@ -218,6 +220,7 @@ class Dpath extends Module {
       exe_reg_ctrl_rf_wen   := false.B
       exe_reg_ctrl_mem_val  := false.B
       exe_reg_ctrl_mem_fcn  := M_X
+      exe_reg_ctrl_mem_ext  := MEX_X
       exe_reg_ctrl_csr_cmd  := CSR.N
       exe_reg_ctrl_br_type  := BR_N
   }
@@ -242,6 +245,7 @@ class Dpath extends Module {
          exe_reg_ctrl_rf_wen   := false.B
          exe_reg_ctrl_mem_val  := false.B
          exe_reg_ctrl_mem_fcn  := M_X
+         exe_reg_ctrl_mem_ext  := MEX_X
          exe_reg_ctrl_csr_cmd  := CSR.N
          exe_reg_ctrl_br_type  := BR_N
       }
@@ -254,6 +258,7 @@ class Dpath extends Module {
          exe_reg_ctrl_mem_val  := io.ctl.mem_val
          exe_reg_ctrl_mem_fcn  := io.ctl.mem_fcn
          exe_reg_ctrl_mem_typ  := io.ctl.mem_typ
+         exe_reg_ctrl_mem_ext  := io.ctl.mem_ext
          exe_reg_ctrl_csr_cmd  := io.ctl.csr_cmd
          exe_reg_ctrl_br_type  := io.ctl.br_type
       }
@@ -298,6 +303,7 @@ class Dpath extends Module {
   mem_reg_ctrl_mem_val  := exe_reg_ctrl_mem_val
   mem_reg_ctrl_mem_fcn  := exe_reg_ctrl_mem_fcn
   mem_reg_ctrl_mem_typ  := exe_reg_ctrl_mem_typ
+  mem_reg_ctrl_mem_ext  := exe_reg_ctrl_mem_ext
   mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
   mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
 
@@ -308,16 +314,25 @@ class Dpath extends Module {
  
   //******************************************************************************************************
   // Memory Stage
-  val temp = exe_reg_ctrl_mem_fcn === M_XRD
-  printf("read en %d\n",temp)
+
   io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
   io.data_readIO.addr  := exe_alu_out.asUInt()
   mem_reg_dram_data    := io.data_readIO.data
   printf("MEM read data = [%x]\n", mem_reg_dram_data)
 
+  val mem_extend_data = MuxCase(mem_reg_dram_data, Array(
+    (mem_reg_ctrl_mem_ext === MEX_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
+    (mem_reg_ctrl_mem_ext === MEX_BU) -> Cat(Fill(56, 0.U                  ), mem_reg_dram_data(7,0)),
+    (mem_reg_ctrl_mem_ext === MEX_H ) -> Cat(Fill(48, mem_reg_dram_data(15)), mem_reg_dram_data(15,0)),
+    (mem_reg_ctrl_mem_ext === MEX_HU) -> Cat(Fill(48, 0.U                  ), mem_reg_dram_data(15,0)),
+    (mem_reg_ctrl_mem_ext === MEX_W ) -> Cat(Fill(32, mem_reg_dram_data(31)), mem_reg_dram_data(31,0)),
+    (mem_reg_ctrl_mem_ext === MEX_WU) -> Cat(Fill(32, 0.U                  ), mem_reg_dram_data(31,0)),
+    (mem_reg_ctrl_mem_ext === MEX_D ) ->                                      mem_reg_dram_data
+  ))
+
   // WB Mux
   mem_wbdata := MuxCase(mem_reg_alu_out, Array(
-    (mem_reg_ctrl_wb_sel === WB_MEM) -> mem_reg_dram_data
+    (mem_reg_ctrl_wb_sel === WB_MEM) -> mem_extend_data
   ))
 
   printf("MEM: valid = %d pc=[%x] inst=[%x] wb_sel=[%d] wbdata=[%x]\n", mem_reg_valid, mem_reg_pc, mem_reg_inst, mem_reg_ctrl_wb_sel, mem_wbdata)
@@ -351,7 +366,7 @@ class Dpath extends Module {
     (exe_reg_ctrl_mem_typ === MT_D)  ->         exe_reg_rs2_data,
   ))    
   val writeMask = Wire(UInt(8.W))
-  writeMask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      
+  writeMask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
 
   io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
   io.data_writeIO.addr := exe_alu_out.asUInt()   
