@@ -180,11 +180,9 @@ class Dpath extends Module {
   val mem_wbdata   = Wire(UInt(XLEN.W))
 
   val dec_rs1_data = Wire(UInt(XLEN.W))
-  val dec_op1_data     = Wire(UInt(XLEN.W)) 
-  val dec_op2_data     = Wire(UInt(XLEN.W))
-  val dec_rs2_data     = Wire(UInt(XLEN.W)) 
-
-
+  val dec_op1_data = Wire(UInt(XLEN.W)) 
+  val dec_op2_data = Wire(UInt(XLEN.W))
+  val dec_rs2_data = Wire(UInt(XLEN.W)) 
 
   dec_rs1_data := MuxCase(rf_rs1_data, Array(
     ((exe_reg_wbaddr === dec_rs1_addr) && (dec_rs1_addr =/= 0.U) && exe_reg_ctrl_rf_wen) -> exe_alu_out,
@@ -194,8 +192,9 @@ class Dpath extends Module {
 
   dec_op1_data := MuxCase(dec_rs1_data, Array(
     (io.ctl.op1_sel === OP1_IMZ)    -> imm_z,
-    (io.ctl.op1_sel === OP1_PC)     -> dec_reg_pc
-  )) 
+    (io.ctl.op1_sel === OP1_PC)     -> dec_reg_pc,
+    (io.ctl.op1_sel === OP1_RS1W)   -> Cat(Fill(32, 0.U), dec_rs1_data(31,0))
+  ))  
   
   dec_op2_data := MuxCase(dec_alu_op2, Array(
     ((exe_reg_wbaddr === dec_rs2_addr) && (dec_rs2_addr =/= 0.U) && exe_reg_ctrl_rf_wen && (io.ctl.op2_sel === OP2_RS2)) -> exe_alu_out,
@@ -277,7 +276,9 @@ class Dpath extends Module {
   alu.io.op := exe_reg_ctrl_alu_fun 
   alu.io.src1 := exe_alu_op1
   alu.io.src2 := exe_alu_op2
-  exe_alu_out := alu.io.res
+  exe_alu_out := MuxCase(alu.io.res, Array(
+      (exe_reg_ctrl_wb_sel === WB_ALUW)-> Cat(Fill(32, alu.io.res(31)), alu.io.res(31,0)),
+  ))
 
   val exe_adder_out = (exe_alu_op1 + exe_alu_op2)(XLEN-1,0)
 
@@ -367,6 +368,7 @@ class Dpath extends Module {
   ))    
   val writeMask = Wire(UInt(8.W))
   writeMask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
+  printf("store: mem_typ=[%x] offset=[%x]\n",exe_reg_ctrl_mem_typ,exe_alu_out(2,0))
 
   io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
   io.data_writeIO.addr := exe_alu_out.asUInt()   

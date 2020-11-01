@@ -15,11 +15,11 @@ class CtlToDatIo extends Bundle(){
   val op1_sel    = Output(UInt(2.W))
   val op2_sel    = Output(UInt(3.W))
   val alu_fun    = Output(UInt(5.W))
-  val wb_sel     = Output(UInt(2.W))
+  val wb_sel     = Output(UInt(3.W))
   val rf_wen     = Output(Bool())
   val mem_val    = Output(Bool())
   val mem_fcn    = Output(UInt(2.W))
-  val mem_typ    = Output(UInt(3.W))
+  val mem_typ    = Output(UInt(8.W))
   val mem_ext    = Output(UInt(3.W))
   val csr_cmd    = Output(UInt(CSR.SZ))
 }
@@ -39,13 +39,14 @@ class Cpath extends Module{
                              List(N, BR_N  , OP1_X , OP2_X    , OEN_0, OEN_0, ALU_X   , WB_X  ,  REN_0, MEN_0, M_X  , MT_X , MEX_X, CSR.N, N),
                Array(       /* val  |  BR  |  op1  |   op2     |  R1  |  R2  |  ALU    |  wb   | rf   | mem  | mem  | mask | mem  | csr  | fence.i */
                             /* inst | type |   sel |    sel    |  oen |  oen |   fcn   |  sel  | wen  |  en  |  wr  | type | ext  | cmd  |         */
-                  LD     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_W, MEX_D , CSR.N, N),
-                  LW     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_W, MEX_W , CSR.N, N),
-                  LWU    -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_W, MEX_WU, CSR.N, N),
-                  LB     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_B, MEX_B , CSR.N, N),
-                  LBU    -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_B ,MEX_BU, CSR.N, N),
-                  LH     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_H, MEX_H , CSR.N, N),
-                  LHU    -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_H, MEX_HU, CSR.N, N),
+                  LD     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_D , CSR.N, N),
+                  LW     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_W , CSR.N, N),
+                  LWU    -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_WU, CSR.N, N),
+                  LB     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_B , CSR.N, N),
+                  LBU    -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_BU, CSR.N, N),
+                  LH     -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_H , CSR.N, N),
+                  LHU    -> List(Y, BR_N  , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_ADD , WB_MEM, REN_1, MEN_1, M_XRD, MT_X, MEX_HU, CSR.N, N),
+                  SD     -> List(Y, BR_N  , OP1_RS1, OP2_STYPE , OEN_1, OEN_1, ALU_ADD , WB_X  , REN_0, MEN_1, M_XWR, MT_D, MEX_X , CSR.N, N),
                   SW     -> List(Y, BR_N  , OP1_RS1, OP2_STYPE , OEN_1, OEN_1, ALU_ADD , WB_X  , REN_0, MEN_1, M_XWR, MT_W, MEX_X , CSR.N, N),
                   SB     -> List(Y, BR_N  , OP1_RS1, OP2_STYPE , OEN_1, OEN_1, ALU_ADD , WB_X  , REN_0, MEN_1, M_XWR, MT_B, MEX_X , CSR.N, N),
                   SH     -> List(Y, BR_N  , OP1_RS1, OP2_STYPE , OEN_1, OEN_1, ALU_ADD , WB_X  , REN_0, MEN_1, M_XWR, MT_H, MEX_X , CSR.N, N),
@@ -73,6 +74,16 @@ class Cpath extends Module{
                   XOR    -> List(Y, BR_N  , OP1_RS1, OP2_RS2   , OEN_1, OEN_1, ALU_XOR , WB_ALU, REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
                   SRA    -> List(Y, BR_N  , OP1_RS1, OP2_RS2   , OEN_1, OEN_1, ALU_SRA , WB_ALU, REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
                   SRL    -> List(Y, BR_N  , OP1_RS1, OP2_RS2   , OEN_1, OEN_1, ALU_SRL , WB_ALU, REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+
+                  ADDIW  -> List(Y, BR_N  , OP1_RS1 , OP2_ITYPE, OEN_1, OEN_0, ALU_ADD , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),  
+                  SLLIW  -> List(Y, BR_N  , OP1_RS1W, OP2_ITYPE, OEN_1, OEN_0, ALU_SLL , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  SRLIW  -> List(Y, BR_N  , OP1_RS1W, OP2_ITYPE, OEN_1, OEN_0, ALU_SRL , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  SRAIW  -> List(Y, BR_N  , OP1_RS1W, OP2_ITYPE, OEN_1, OEN_0, ALU_SRAW, WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  ADDW   -> List(Y, BR_N  , OP1_RS1 , OP2_RS2  , OEN_1, OEN_1, ALU_ADD , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  SUBW   -> List(Y, BR_N  , OP1_RS1 , OP2_RS2  , OEN_1, OEN_1, ALU_SUB , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  SLLW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SLL , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  SRAW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SRAW, WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
+                  SRLW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SRL , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
 
                   JAL    -> List(Y, BR_J  , OP1_RS1, OP2_UJTYPE, OEN_0, OEN_0, ALU_X   , WB_PC4, REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),
                   JALR   -> List(Y, BR_JR , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_X   , WB_PC4, REN_1, MEN_0, M_X  , MT_X, MEX_X , CSR.N, N),

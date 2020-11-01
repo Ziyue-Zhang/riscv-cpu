@@ -8,7 +8,7 @@ class alu extends Module{
   val io = IO(new Bundle {
       val src1 = Input(UInt(XLEN.W))
       val src2 = Input(UInt(XLEN.W))
-      val op = Input(UInt(4.W))
+      val op = Input(UInt(5.W))
       val res =  Output(UInt(XLEN.W))
   })
 
@@ -28,7 +28,8 @@ class alu extends Module{
     (op === ALU_SRA)    -> (src1.asSInt() >> shamt).asUInt(),
     (op === ALU_SRL)    -> (src1 >> shamt).asUInt(),
     (op === ALU_COPY_1) -> src1,
-    (op === ALU_COPY_2) -> src2
+    (op === ALU_COPY_2) -> src2,
+    (op === ALU_SRAW)   -> Cat(Fill(32, src1(31)), (src1(31,0).asSInt() >> shamt).asUInt()),
   ))
 
   printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res);

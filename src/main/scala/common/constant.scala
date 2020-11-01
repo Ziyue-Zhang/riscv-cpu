@@ -64,6 +64,7 @@ trait RiscvConstants {
    val OP1_RS1   = 0.asUInt(2.W) // Register Source #1
    val OP1_PC    = 1.asUInt(2.W) // PC
    val OP1_IMZ   = 2.asUInt(2.W) // Zero-extended Immediate from RS1 field, for use by CSRI instructions
+   val OP1_RS1W  = 3.asUInt(2.W)
    val OP1_X     = 0.asUInt(2.W)
 
    // RS2 Operand Select Signal
@@ -84,26 +85,28 @@ trait RiscvConstants {
    val REN_1   = true.B
 
    // ALU Operation Signal
-   val ALU_ADD    = 0.asUInt(4.W)
-   val ALU_SUB    = 1.asUInt(4.W)
-   val ALU_SLL    = 2.asUInt(4.W)
-   val ALU_SRL    = 3.asUInt(4.W)
-   val ALU_SRA    = 4.asUInt(4.W)
-   val ALU_AND    = 5.asUInt(4.W)
-   val ALU_OR     = 6.asUInt(4.W)
-   val ALU_XOR    = 7.asUInt(4.W)
-   val ALU_SLT    = 8.asUInt(4.W)
-   val ALU_SLTU   = 9.asUInt(4.W)
-   val ALU_COPY_1 = 10.asUInt(4.W)
-   val ALU_COPY_2 = 11.asUInt(4.W)
-   val ALU_X      = 0.asUInt(4.W)
+   val ALU_ADD    = 0.asUInt(5.W)
+   val ALU_SUB    = 1.asUInt(5.W)
+   val ALU_SLL    = 2.asUInt(5.W)
+   val ALU_SRL    = 3.asUInt(5.W)
+   val ALU_SRA    = 4.asUInt(5.W)
+   val ALU_AND    = 5.asUInt(5.W)
+   val ALU_OR     = 6.asUInt(5.W)
+   val ALU_XOR    = 7.asUInt(5.W)
+   val ALU_SLT    = 8.asUInt(5.W)
+   val ALU_SLTU   = 9.asUInt(5.W)
+   val ALU_COPY_1 = 10.asUInt(5.W)
+   val ALU_COPY_2 = 11.asUInt(5.W)
+   val ALU_SRAW   = 12.asUInt(5.W)
+   val ALU_X      = 0.asUInt(5.W)
 
    // Writeback Select Signal
-   val WB_ALU  = 0.asUInt(2.W)
-   val WB_MEM  = 1.asUInt(2.W)
-   val WB_PC4  = 2.asUInt(2.W)
-   val WB_CSR  = 3.asUInt(2.W)
-   val WB_X    = 0.asUInt(2.W)
+   val WB_ALU  = 0.asUInt(3.W)
+   val WB_MEM  = 1.asUInt(3.W)
+   val WB_PC4  = 2.asUInt(3.W)
+   val WB_CSR  = 3.asUInt(3.W)
+   val WB_ALUW = 4.asUInt(3.W)
+   val WB_X    = 0.asUInt(3.W)
 
    // Memory Enable Signal
    val MEN_0   = false.B
