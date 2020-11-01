@@ -55,7 +55,7 @@ class Dpath extends Module {
   val exe_reg_ctrl_mem_val  = RegInit(false.B)
   val exe_reg_ctrl_mem_fcn  = RegInit(M_X)
   val exe_reg_ctrl_mem_typ  = RegInit(MT_X)
-  val exe_reg_ctrl_mem_ext = RegInit(MEX_X)
+  val exe_reg_ctrl_mem_ext = RegInit(MWD_X)
   val exe_reg_ctrl_csr_cmd = RegInit(CSR.N)
 
   // Memory State
@@ -74,7 +74,7 @@ class Dpath extends Module {
   val mem_reg_ctrl_mem_fcn  = RegInit(M_X)
   val mem_reg_ctrl_mem_typ  = RegInit(MT_X)
   val mem_reg_ctrl_wb_sel = Reg(UInt())
-  val mem_reg_ctrl_mem_ext = RegInit(MEX_X)
+  val mem_reg_ctrl_mem_ext = RegInit(MWD_X)
   val mem_reg_ctrl_csr_cmd = RegInit(CSR.N)
   val mem_reg_dram_data = RegInit(0.asUInt(XLEN.W))
 
@@ -87,7 +87,7 @@ class Dpath extends Module {
   val wb_reg_ctrl_rf_wen = RegInit(false.B)
 
 
-  //******************************************************************************************************
+  //********************************************************************************************************************
   // Instruction Fetch Stage
   val if_pc_next = Wire(UInt(XLEN.W)) // next_pc
   val exe_brjmp_target = Wire(UInt(XLEN.W))
@@ -131,7 +131,7 @@ class Dpath extends Module {
   printf("IF : pc=[%x] inst=[%x] if_pc_next=[%x] en=%d pc_sel=[%d] e_bj_pc=[%x]\n", if_reg_pc, if_inst, if_pc_next, io.inst_readIO.en, io.ctl.exe_pc_sel, exe_brjmp_target)
 
 
-  //******************************************************************************************************
+  //********************************************************************************************************************
   // Decode Stage
 
   val dec_rs1_addr = dec_reg_inst(19, 15)
@@ -219,7 +219,7 @@ class Dpath extends Module {
       exe_reg_ctrl_rf_wen   := false.B
       exe_reg_ctrl_mem_val  := false.B
       exe_reg_ctrl_mem_fcn  := M_X
-      exe_reg_ctrl_mem_ext  := MEX_X
+      exe_reg_ctrl_mem_ext  := MWD_X
       exe_reg_ctrl_csr_cmd  := CSR.N
       exe_reg_ctrl_br_type  := BR_N
   }
@@ -244,7 +244,7 @@ class Dpath extends Module {
          exe_reg_ctrl_rf_wen   := false.B
          exe_reg_ctrl_mem_val  := false.B
          exe_reg_ctrl_mem_fcn  := M_X
-         exe_reg_ctrl_mem_ext  := MEX_X
+         exe_reg_ctrl_mem_ext  := MWD_X
          exe_reg_ctrl_csr_cmd  := CSR.N
          exe_reg_ctrl_br_type  := BR_N
       }
@@ -266,7 +266,7 @@ class Dpath extends Module {
 
   printf("DEC: valid = %d pc=[%x] inst=[%x] op1=[%x] alu2=[%x] op2=[%x]\n", dec_reg_valid, dec_reg_pc, dec_reg_inst, dec_op1_data, dec_alu_op2, dec_op2_data)
 
-  //******************************************************************************************************
+  //********************************************************************************************************************
   // Execute Stage
   val exe_alu_op1 = exe_reg_op1_data.asUInt()
   val exe_alu_op2 = exe_reg_op2_data.asUInt()
@@ -313,7 +313,7 @@ class Dpath extends Module {
 
   printf("EXE: valid = %d pc=[%x] inst=[%x] bj_target = [%x]\n", exe_reg_valid, exe_reg_pc, exe_reg_inst, exe_brjmp_target)
  
-  //******************************************************************************************************
+  //********************************************************************************************************************
   // Memory Stage
 
   io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
@@ -321,24 +321,24 @@ class Dpath extends Module {
   mem_reg_dram_data    := io.data_readIO.data
   printf("MEM read data = [%x]\n", mem_reg_dram_data)
 
-  val mem_extend_data = MuxCase(mem_reg_dram_data, Array(
-    (mem_reg_ctrl_mem_ext === MEX_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
-    (mem_reg_ctrl_mem_ext === MEX_BU) -> Cat(Fill(56, 0.U                  ), mem_reg_dram_data(7,0)),
-    (mem_reg_ctrl_mem_ext === MEX_H ) -> Cat(Fill(48, mem_reg_dram_data(15)), mem_reg_dram_data(15,0)),
-    (mem_reg_ctrl_mem_ext === MEX_HU) -> Cat(Fill(48, 0.U                  ), mem_reg_dram_data(15,0)),
-    (mem_reg_ctrl_mem_ext === MEX_W ) -> Cat(Fill(32, mem_reg_dram_data(31)), mem_reg_dram_data(31,0)),
-    (mem_reg_ctrl_mem_ext === MEX_WU) -> Cat(Fill(32, 0.U                  ), mem_reg_dram_data(31,0)),
-    (mem_reg_ctrl_mem_ext === MEX_D ) ->                                      mem_reg_dram_data
+  val mem_data = MuxCase(mem_reg_dram_data, Array(
+    (mem_reg_ctrl_mem_ext === MWD_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
+    (mem_reg_ctrl_mem_ext === MWD_BU) -> Cat(Fill(56, 0.U                  ), mem_reg_dram_data(7,0)),
+    (mem_reg_ctrl_mem_ext === MWD_H ) -> Cat(Fill(48, mem_reg_dram_data(15)), mem_reg_dram_data(15,0)),
+    (mem_reg_ctrl_mem_ext === MWD_HU) -> Cat(Fill(48, 0.U                  ), mem_reg_dram_data(15,0)),
+    (mem_reg_ctrl_mem_ext === MWD_W ) -> Cat(Fill(32, mem_reg_dram_data(31)), mem_reg_dram_data(31,0)),
+    (mem_reg_ctrl_mem_ext === MWD_WU) -> Cat(Fill(32, 0.U                  ), mem_reg_dram_data(31,0)),
+    (mem_reg_ctrl_mem_ext === MWD_D ) ->                                      mem_reg_dram_data
   ))
 
   // WB Mux
   mem_wbdata := MuxCase(mem_reg_alu_out, Array(
-    (mem_reg_ctrl_wb_sel === WB_MEM) -> mem_extend_data
+    (mem_reg_ctrl_wb_sel === WB_MEM) -> mem_data
   ))
 
   printf("MEM: valid = %d pc=[%x] inst=[%x] wb_sel=[%d] wbdata=[%x]\n", mem_reg_valid, mem_reg_pc, mem_reg_inst, mem_reg_ctrl_wb_sel, mem_wbdata)
 
-  //******************************************************************************************************
+  //********************************************************************************************************************
   // Writeback Stage
     wb_reg_valid  := mem_reg_valid
     wb_reg_pc     := mem_reg_pc
@@ -350,7 +350,7 @@ class Dpath extends Module {
 
   printf("WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n", wb_reg_valid, wb_reg_pc, RegNext(mem_reg_inst), wb_reg_wbdata, wb_reg_wbaddr)
 
-  //******************************************************************************************************
+  //********************************************************************************************************************
   // External Signals
 
   // datapath to controlpath outputs
@@ -360,20 +360,20 @@ class Dpath extends Module {
   io.dat.exe_br_ltu := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
   io.dat.exe_br_type:= exe_reg_ctrl_br_type
 
-  val writeData = MuxCase(exe_reg_rs2_data, Array(
+  val write_data = MuxCase(exe_reg_rs2_data, Array(
     (exe_reg_ctrl_mem_typ === MT_B)  -> Fill(8, exe_reg_rs2_data( 7,0)),
     (exe_reg_ctrl_mem_typ === MT_H)  -> Fill(4, exe_reg_rs2_data(15,0)),
     (exe_reg_ctrl_mem_typ === MT_W)  -> Fill(2, exe_reg_rs2_data(31,0)),
-    (exe_reg_ctrl_mem_typ === MT_D)  ->         exe_reg_rs2_data,
+    (exe_reg_ctrl_mem_typ === MT_D)  ->         exe_reg_rs2_data
   ))    
-  val writeMask = Wire(UInt(8.W))
-  writeMask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
+  val write_mask = Wire(UInt(8.W))
+  write_mask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
   printf("store: mem_typ=[%x] offset=[%x]\n",exe_reg_ctrl_mem_typ,exe_alu_out(2,0))
 
   io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
   io.data_writeIO.addr := exe_alu_out.asUInt()   
-  io.data_writeIO.data := writeData     
-  io.data_writeIO.mask := writeMask    
+  io.data_writeIO.data := write_data     
+  io.data_writeIO.mask := write_mask    
   printf("store:addr = [%x] en=%d data = [%x] mask = %b\n ", io.data_writeIO.addr, io.data_writeIO.en, io.data_writeIO.data, io.data_writeIO.mask)
 
   printf("pc=[%x] W[r%d=%x][%d] Op1=[r%d][%x] Op2=[r%d][%x] inst=[%x]\n\n",

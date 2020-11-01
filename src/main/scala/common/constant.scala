@@ -98,6 +98,18 @@ trait RiscvConstants {
    val ALU_COPY_1 = 10.asUInt(5.W)
    val ALU_COPY_2 = 11.asUInt(5.W)
    val ALU_SRAW   = 12.asUInt(5.W)
+   val ALU_MUL    = 13.asUInt(5.W)
+   val ALU_DIV    = 14.asUInt(5.W)
+   val ALU_REMW   = 15.asUInt(5.W)
+   val ALU_REMUW  = 16.asUInt(5.W)
+   val ALU_DIVUW  = 17.asUInt(5.W)
+   val ALU_MULH   = 18.asUInt(5.W)
+   val ALU_MULHSU = 19.asUInt(5.W)
+   val ALU_MULHU  = 20.asUInt(5.W)
+   val ALU_DIVU   = 21.asUInt(5.W)
+   val ALU_DIVW   = 22.asUInt(5.W)
+   val ALU_REM    = 23.asUInt(5.W)
+   val ALU_REMU   = 24.asUInt(5.W)
    val ALU_X      = 0.asUInt(5.W)
 
    // Writeback Select Signal
@@ -125,14 +137,14 @@ trait MemoryOpConstants {
    val M_XRD = 1.asUInt(2.W) // int load
    val M_XWR = 2.asUInt(2.W) // int store
 
-   val MEX_B  = 0.asUInt(3.W)
-   val MEX_BU = 1.asUInt(3.W)
-   val MEX_H  = 2.asUInt(3.W)
-   val MEX_HU = 3.asUInt(3.W)
-   val MEX_W  = 4.asUInt(3.W)
-   val MEX_WU = 5.asUInt(3.W)
-   val MEX_D  = 6.asUInt(3.W)
-   val MEX_X  = 0.asUInt(3.W)
+   val MWD_B  = 0.asUInt(3.W)
+   val MWD_BU = 1.asUInt(3.W)
+   val MWD_H  = 2.asUInt(3.W)
+   val MWD_HU = 3.asUInt(3.W)
+   val MWD_W  = 4.asUInt(3.W)
+   val MWD_WU = 5.asUInt(3.W)
+   val MWD_D  = 6.asUInt(3.W)
+   val MWD_X  = 0.asUInt(3.W)
 }
 
 object CSR
