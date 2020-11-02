@@ -20,7 +20,7 @@ class CtlToDatIo extends Bundle(){
   val mem_val    = Output(Bool())
   val mem_fcn    = Output(UInt(2.W))
   val mem_typ    = Output(UInt(8.W))
-  val mem_ext    = Output(UInt(3.W))
+  val mem_wid    = Output(UInt(3.W))
   val csr_cmd    = Output(UInt(CSR.SZ))
 }
 
@@ -111,7 +111,7 @@ class Cpath extends Module{
                   ))
                   
   val (cs_val_inst: Bool) :: cs_br_type :: cs_op1_sel :: cs_op2_sel :: (cs_rs1_oen: Bool) :: (cs_rs2_oen: Bool) :: cs0 = csignals
-  val cs_alu_fun :: cs_wb_sel :: (cs_rf_wen: Bool) :: (cs_mem_en: Bool) :: cs_mem_fcn :: cs_msk_sel :: cs_mem_ext :: cs_csr_cmd :: (cs_fencei: Bool) :: Nil = cs0
+  val cs_alu_fun :: cs_wb_sel :: (cs_rf_wen: Bool) :: (cs_mem_en: Bool) :: cs_mem_fcn :: cs_msk_sel :: cs_mem_wid :: cs_csr_cmd :: (cs_fencei: Bool) :: Nil = cs0
 
   // Branch Logic   
   val ctrl_exe_pc_sel = Mux(false.B                      , PC_EXC,
@@ -202,7 +202,7 @@ class Cpath extends Module{
    io.ctl.mem_val    := cs_mem_en
    io.ctl.mem_fcn    := cs_mem_fcn
    io.ctl.mem_typ    := cs_msk_sel
-   io.ctl.mem_ext    := cs_mem_ext
+   io.ctl.mem_wid    := cs_mem_wid
 
   val rs1_addr = io.dat.dec_inst(RS1_MSB, RS1_LSB)
   val csr_ren = (cs_csr_cmd === CSR.S || cs_csr_cmd === CSR.C) && rs1_addr === 0.U

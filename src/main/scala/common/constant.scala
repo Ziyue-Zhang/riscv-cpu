@@ -31,7 +31,14 @@ trait RiscvConstants {
   val Y      = true.B
   val N      = false.B
 
-  val START_ADDR = "h80000000".U
+  val MTVEC = 0x100
+  val START_ADDR = "h80000000".U //MTVEC + 0x100
+
+  val SZ_PRV = 2
+  val PRV_U = 0
+  val PRV_S = 1
+  val PRV_H = 2
+  val PRV_M = 3
 
 
   val PC_4   = 0.asUInt(2.W)  // PC + 4
@@ -145,19 +152,4 @@ trait MemoryOpConstants {
    val MWD_WU = 5.asUInt(3.W)
    val MWD_D  = 6.asUInt(3.W)
    val MWD_X  = 0.asUInt(3.W)
-}
-
-object CSR
-{
-  // commands
-  val SZ = 3.W
-  val X = 0.asUInt(SZ)
-  val N = 0.asUInt(SZ)
-  val W = 1.asUInt(SZ)
-  val S = 2.asUInt(SZ)
-  val C = 3.asUInt(SZ)
-  val I = 4.asUInt(SZ)
-  val R = 5.asUInt(SZ)
-
-  val ADDRSZ = 12
 }

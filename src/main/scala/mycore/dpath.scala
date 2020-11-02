@@ -55,7 +55,7 @@ class Dpath extends Module {
   val exe_reg_ctrl_mem_val  = RegInit(false.B)
   val exe_reg_ctrl_mem_fcn  = RegInit(M_X)
   val exe_reg_ctrl_mem_typ  = RegInit(MT_X)
-  val exe_reg_ctrl_mem_ext = RegInit(MWD_X)
+  val exe_reg_ctrl_mem_wid = RegInit(MWD_X)
   val exe_reg_ctrl_csr_cmd = RegInit(CSR.N)
 
   // Memory State
@@ -74,7 +74,7 @@ class Dpath extends Module {
   val mem_reg_ctrl_mem_fcn  = RegInit(M_X)
   val mem_reg_ctrl_mem_typ  = RegInit(MT_X)
   val mem_reg_ctrl_wb_sel = Reg(UInt())
-  val mem_reg_ctrl_mem_ext = RegInit(MWD_X)
+  val mem_reg_ctrl_mem_wid = RegInit(MWD_X)
   val mem_reg_ctrl_csr_cmd = RegInit(CSR.N)
   val mem_reg_dram_data = RegInit(0.asUInt(XLEN.W))
 
@@ -219,7 +219,7 @@ class Dpath extends Module {
       exe_reg_ctrl_rf_wen   := false.B
       exe_reg_ctrl_mem_val  := false.B
       exe_reg_ctrl_mem_fcn  := M_X
-      exe_reg_ctrl_mem_ext  := MWD_X
+      exe_reg_ctrl_mem_wid  := MWD_X
       exe_reg_ctrl_csr_cmd  := CSR.N
       exe_reg_ctrl_br_type  := BR_N
   }
@@ -244,7 +244,7 @@ class Dpath extends Module {
          exe_reg_ctrl_rf_wen   := false.B
          exe_reg_ctrl_mem_val  := false.B
          exe_reg_ctrl_mem_fcn  := M_X
-         exe_reg_ctrl_mem_ext  := MWD_X
+         exe_reg_ctrl_mem_wid  := MWD_X
          exe_reg_ctrl_csr_cmd  := CSR.N
          exe_reg_ctrl_br_type  := BR_N
       }
@@ -257,7 +257,7 @@ class Dpath extends Module {
          exe_reg_ctrl_mem_val  := io.ctl.mem_val
          exe_reg_ctrl_mem_fcn  := io.ctl.mem_fcn
          exe_reg_ctrl_mem_typ  := io.ctl.mem_typ
-         exe_reg_ctrl_mem_ext  := io.ctl.mem_ext
+         exe_reg_ctrl_mem_wid  := io.ctl.mem_wid
          exe_reg_ctrl_csr_cmd  := io.ctl.csr_cmd
          exe_reg_ctrl_br_type  := io.ctl.br_type
       }
@@ -304,7 +304,7 @@ class Dpath extends Module {
   mem_reg_ctrl_mem_val  := exe_reg_ctrl_mem_val
   mem_reg_ctrl_mem_fcn  := exe_reg_ctrl_mem_fcn
   mem_reg_ctrl_mem_typ  := exe_reg_ctrl_mem_typ
-  mem_reg_ctrl_mem_ext  := exe_reg_ctrl_mem_ext
+  mem_reg_ctrl_mem_wid  := exe_reg_ctrl_mem_wid
   mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
   mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
 
@@ -322,13 +322,13 @@ class Dpath extends Module {
   printf("MEM read data = [%x]\n", mem_reg_dram_data)
 
   val mem_data = MuxCase(mem_reg_dram_data, Array(
-    (mem_reg_ctrl_mem_ext === MWD_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
-    (mem_reg_ctrl_mem_ext === MWD_BU) -> Cat(Fill(56, 0.U                  ), mem_reg_dram_data(7,0)),
-    (mem_reg_ctrl_mem_ext === MWD_H ) -> Cat(Fill(48, mem_reg_dram_data(15)), mem_reg_dram_data(15,0)),
-    (mem_reg_ctrl_mem_ext === MWD_HU) -> Cat(Fill(48, 0.U                  ), mem_reg_dram_data(15,0)),
-    (mem_reg_ctrl_mem_ext === MWD_W ) -> Cat(Fill(32, mem_reg_dram_data(31)), mem_reg_dram_data(31,0)),
-    (mem_reg_ctrl_mem_ext === MWD_WU) -> Cat(Fill(32, 0.U                  ), mem_reg_dram_data(31,0)),
-    (mem_reg_ctrl_mem_ext === MWD_D ) ->                                      mem_reg_dram_data
+    (mem_reg_ctrl_mem_wid === MWD_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
+    (mem_reg_ctrl_mem_wid === MWD_BU) -> Cat(Fill(56, 0.U                  ), mem_reg_dram_data(7,0)),
+    (mem_reg_ctrl_mem_wid === MWD_H ) -> Cat(Fill(48, mem_reg_dram_data(15)), mem_reg_dram_data(15,0)),
+    (mem_reg_ctrl_mem_wid === MWD_HU) -> Cat(Fill(48, 0.U                  ), mem_reg_dram_data(15,0)),
+    (mem_reg_ctrl_mem_wid === MWD_W ) -> Cat(Fill(32, mem_reg_dram_data(31)), mem_reg_dram_data(31,0)),
+    (mem_reg_ctrl_mem_wid === MWD_WU) -> Cat(Fill(32, 0.U                  ), mem_reg_dram_data(31,0)),
+    (mem_reg_ctrl_mem_wid === MWD_D ) ->                                      mem_reg_dram_data
   ))
 
   // WB Mux
