@@ -71,26 +71,26 @@ int difftest_step(Emu* emu) {
     reg_t temp=0;
     //for(int i=10000; i>0; i--) {
         //emu->step(1);
-        emu->emu_difftest_getregs(reg_dut);
+    emu->emu_difftest_getregs(reg_dut);
         
-        ref_difftest_getregs(&reg_ref);
-        ref_isa_reg_display();
-        bool flag = false;
-        for (int i = 0; i < 32; i++) {
-            if (reg_dut[i] != reg_ref[i]) {
-                printf("reg %d %s different at pc = [0x%16lx], nemu=[0x%16lx], mycore=[0x%16lx]\n",
-                i, reg_name[i], reg_dut[32], reg_ref[i], reg_dut[i]);
-                flag=true;
-            }
-        }
-        if(reg_dut[32] != reg_ref[32]) {
-            printf("right pc = [0x%16lx], wrong pc = [0x%16lx] \n", reg_ref[32], reg_dut[32]);
+    ref_difftest_getregs(&reg_ref);
+    ref_isa_reg_display();
+    bool flag = false;
+    for (int i = 0; i < 32; i++) {
+        if (reg_dut[i] != reg_ref[i]) {
+            printf("reg %d %s different at pc = [0x%16lx], nemu=[0x%16lx], mycore=[0x%16lx]\n",
+            i, reg_name[i], reg_dut[32], reg_ref[i], reg_dut[i]);
             flag=true;
         }
-        if(flag){
-            return -1;
-        }
-        ref_difftest_exec(1);
+    }
+    if(reg_dut[32] != reg_ref[32]) {
+        printf("right pc = [0x%16lx], wrong pc = [0x%16lx] \n", reg_ref[32], reg_dut[32]);
+        flag=true;
+    }
+    if(flag){
+        return -1;
+    }
+    ref_difftest_exec(1);
     //}
     return 0;
 }

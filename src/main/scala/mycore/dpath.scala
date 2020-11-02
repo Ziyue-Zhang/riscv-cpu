@@ -128,7 +128,7 @@ class Dpath extends Module {
   }
 
   //DEBUG:
-  printf("IF : pc=[%x] inst=[%x] if_pc_next=[%x] en=%d pc_sel=[%d] e_bj_pc=[%x]\n", if_reg_pc, if_inst, if_pc_next, io.inst_readIO.en, io.ctl.exe_pc_sel, exe_brjmp_target)
+  printf("IF : pc=[%x] inst=[%x] if_pc_next=[%x] pc_sel=[%d] e_bj_pc=[%x]\n", if_reg_pc, if_inst, if_pc_next, io.ctl.exe_pc_sel, exe_brjmp_target)
 
 
   //********************************************************************************************************************
@@ -160,10 +160,10 @@ class Dpath extends Module {
   val imm_z = Cat(Fill(27, 0.U), dec_reg_inst(19, 15))
 
   // sign-extend immediates
-  val imm_itype_sext = Cat(Fill(52, imm_itype(11)), imm_itype)
-  val imm_stype_sext = Cat(Fill(52, imm_stype(11)), imm_stype)
+  val imm_itype_sext  = Cat(Fill(52, imm_itype(11)), imm_itype)
+  val imm_stype_sext  = Cat(Fill(52, imm_stype(11)), imm_stype)
   val imm_sbtype_sext = Cat(Fill(51, imm_sbtype(11)), imm_sbtype, 0.U)
-  val imm_utype_sext = Cat(Fill(32, imm_utype(19)), imm_utype, Fill(12, 0.U))
+  val imm_utype_sext  = Cat(Fill(32, imm_utype(19)), imm_utype, Fill(12, 0.U))
   val imm_ujtype_sext = Cat(Fill(43, imm_ujtype(19)), imm_ujtype, 0.U)
 
   val dec_alu_op2 = MuxCase(0.U, Array(
@@ -307,9 +307,6 @@ class Dpath extends Module {
   mem_reg_ctrl_mem_wid  := exe_reg_ctrl_mem_wid
   mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
   mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
-
-
-
 
   printf("EXE: valid = %d pc=[%x] inst=[%x] bj_target = [%x]\n", exe_reg_valid, exe_reg_pc, exe_reg_inst, exe_brjmp_target)
  

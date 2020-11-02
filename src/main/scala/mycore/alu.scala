@@ -31,7 +31,8 @@ class alu extends Module{
     (op === ALU_COPY_2) -> src2,
     (op === ALU_SRAW)   -> Cat(Fill(32, src1(31)), (src1(31,0).asSInt() >> shamt).asUInt()),
     (op === ALU_MUL)-> (src1 * src2)(63,0).asUInt(),
-    (op === ALU_DIV)-> Mux(src2 === 0.U,0.U,(src1.asSInt() / src2.asSInt()).asUInt()),
+    //(op === ALU_DIV)-> Mux(src2 === 0.U,0.U,(src1.asSInt() / src2.asSInt()).asUInt()),
+    (op === ALU_DIV)-> Mux(src2 === 0.U,0.U,(src1 / src2).asUInt()),
     (op === ALU_REMW)-> Mux(src2 === 0.U,0.U,(src1(31,0).asSInt() % src2(31,0).asSInt()).asUInt()),
     (op === ALU_REMUW)-> Mux(src2 === 0.U,0.U,(src1(31,0) % src2(31,0)).asUInt()),
     (op === ALU_DIVUW)-> Mux(src2 === 0.U,0.U,(src1(31,0) / src2(31,0)).asUInt()),
@@ -39,10 +40,11 @@ class alu extends Module{
     (op === ALU_MULHSU) -> (src1.asSInt() * src2)(127,64).asUInt(),
     (op === ALU_MULHU) -> (src1 * src2)(127,64).asUInt(),
     (op === ALU_DIVU) -> Mux(src2 === 0.U,0.U,(src1 / src2).asUInt()),
-    (op === ALU_DIVW) -> Mux(src2 === 0.U,0.U,(src1(31,0).asSInt() / src2(31,0).asSInt()).asUInt()),
+    //(op === ALU_DIVW) -> Mux(src2 === 0.U,0.U,(src1(31,0).asSInt() / src2(31,0).asSInt()).asUInt()),
+    (op === ALU_DIVW) -> Mux(src2 === 0.U,0.U,(src1(31,0) / src2(31,0)).asUInt()),
     (op === ALU_REM) -> Mux(src2 === 0.U,0.U,(src1.asSInt() % src2.asSInt()).asUInt()),
     (op === ALU_REMU) -> Mux(src2 === 0.U,0.U,(src1 % src2).asUInt())
   ))
 
-  printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res);
+  printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res)
 }

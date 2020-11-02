@@ -3,17 +3,10 @@
 #include <assert.h>
 #include <string.h>
 
-Ram::Ram(char* imgPath)
-{
-//#ifdef DEBUG
-  ram_size = RAMSIZE / sizeof(inst_t);
+Ram::Ram(char* imgPath) {
+  ram_size = RAMSIZE / sizeof(reg_t);
   memset(ram, 0, ram_size);
-  /*img_size = 3;
-  ram[0] = 0x800002b7;  // lui t0,0x80000
-  ram[2] = 0x0002a023;  // sw  zero,0(t0)
-  ram[3] = 0x0002a503;  // lw  a0,0(t0)*/
 
-//#else
   assert(imgPath && "No image file.");
   FILE *fp = fopen(imgPath, "rb");
   assert(fp && "Can not open image file.");
@@ -26,11 +19,6 @@ Ram::Ram(char* imgPath)
   assert(ret == 1 && "Can not read image file.");
   fclose(fp);
 
-//#ifdef DEBUG
-  printf("RAM: %x\n", (unsigned int)ram[0]);
-//#endif
-
-//#endif
 }
 
 void* Ram::get_img_start()
@@ -44,28 +32,27 @@ int Ram::get_img_size()
 }
 
 
-inst_t Ram::InstRead(inst_t addr, bool en)
-{
+inst_t Ram::InstRead(reg_t addr, bool en){
   if(!en){
     return 0;
   }
   printf("inst read addr = 0x%016lx \n", addr);
   assert(ADDR_START <= addr &&
-        addr <= ADDR_START + ram_size &&
-        "read addr out of range");
-  return en ? ram[(addr - ADDR_START) / sizeof(inst_t)] : 0;
+      addr <= ADDR_START + ram_size &&
+      "read addr out of range");
+  return ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8);
 }
 
-reg_t Ram::DataRead(reg_t addr, bool en)
-{
+reg_t Ram::DataRead(reg_t addr, bool en){
   if(!en){
     return 0;
   }
-  printf("data addr = 0x%016lx \n", addr);
-    assert(ADDR_START <= addr &&
-        addr <= ADDR_START + ram_size &&
-        "read data addr out of range");
-    return en ? ram[(addr - ADDR_START) / sizeof(reg_t)] : 0; // 读data_ram
+  printf("data read addr = 0x%016lx data = 0x%016lx\n", addr,
+    ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8));
+  assert(ADDR_START <= addr &&
+      addr <= ADDR_START + ram_size &&
+      "read data addr out of range");
+  return ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8);
 }
 
 void Ram::DataWrite(reg_t addr, reg_t data, bool en, mask_t mask)
@@ -74,9 +61,19 @@ void Ram::DataWrite(reg_t addr, reg_t data, bool en, mask_t mask)
     return;
   }
   assert(ADDR_START <= addr &&
-        addr <= ADDR_START + ram_size &&
-        "write data addr out of range");
-    if (en) {
-    ram[(addr - ADDR_START) / sizeof(reg_t)] = data;
+      addr <= ADDR_START + ram_size &&
+      "write data addr out of range");
+    
+  reg_t data_mask = data;
+  reg_t full_mask = 0;
+  reg_t tmp = 0xff;     
+  for (size_t i = 0; i < 8; i++) {
+      if ((mask >> i) & 0x1) {
+          full_mask = full_mask | (tmp << (i*8));
+      }
   }
+  data_mask = (full_mask & data) | (~full_mask & ram[(addr - ADDR_START) / sizeof(reg_t)]);
+  ram[(addr - ADDR_START) / sizeof(reg_t)] = data_mask;
+  printf("data write addr = 0x%016lx \n", addr);
+  printf("mask = %x, fullMask= 0x%016lx, data = 0x%016lx, data_mask = 0x%016lx\n", mask, full_mask, data, data_mask);
 }
