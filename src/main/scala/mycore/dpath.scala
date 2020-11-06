@@ -373,17 +373,7 @@ class Dpath extends Module {
   io.data_writeIO.mask := write_mask    
   printf("store:addr = [%x] en=%d data = [%x] mask = %b\n ", io.data_writeIO.addr, io.data_writeIO.en, io.data_writeIO.data, io.data_writeIO.mask)
 
-  printf("pc=[%x] W[r%d=%x][%d] Op1=[r%d][%x] Op2=[r%d][%x] inst=[%x]\n\n",
-    wb_reg_pc,
-    wb_reg_wbaddr,
-    wb_reg_wbdata,
-    wb_reg_ctrl_rf_wen,
-    RegNext(mem_reg_rs1_addr),
-    RegNext(mem_reg_op1_data),
-    RegNext(mem_reg_rs2_addr),
-    RegNext(mem_reg_op2_data),
-    wb_reg_inst)
-
+  printf("pc=[%x]\n", wb_reg_pc)
 
   BoringUtils.addSource(wb_reg_pc, "diffTestPC")
   BoringUtils.addSource(wb_reg_valid, "diffTestValid")  
