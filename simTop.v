@@ -1171,42 +1171,31 @@ module Dpath(
   reg [63:0] _RAND_5;
   reg [63:0] _RAND_6;
   reg [31:0] _RAND_7;
-  reg [31:0] _RAND_8;
-  reg [31:0] _RAND_9;
+  reg [63:0] _RAND_8;
+  reg [63:0] _RAND_9;
   reg [63:0] _RAND_10;
-  reg [63:0] _RAND_11;
-  reg [63:0] _RAND_12;
+  reg [31:0] _RAND_11;
+  reg [31:0] _RAND_12;
   reg [31:0] _RAND_13;
   reg [31:0] _RAND_14;
   reg [31:0] _RAND_15;
   reg [31:0] _RAND_16;
   reg [31:0] _RAND_17;
   reg [31:0] _RAND_18;
-  reg [31:0] _RAND_19;
-  reg [31:0] _RAND_20;
+  reg [63:0] _RAND_19;
+  reg [63:0] _RAND_20;
   reg [63:0] _RAND_21;
-  reg [63:0] _RAND_22;
-  reg [63:0] _RAND_23;
+  reg [31:0] _RAND_22;
+  reg [31:0] _RAND_23;
   reg [31:0] _RAND_24;
   reg [31:0] _RAND_25;
-  reg [31:0] _RAND_26;
-  reg [63:0] _RAND_27;
+  reg [63:0] _RAND_26;
+  reg [31:0] _RAND_27;
   reg [63:0] _RAND_28;
   reg [31:0] _RAND_29;
-  reg [31:0] _RAND_30;
+  reg [63:0] _RAND_30;
   reg [31:0] _RAND_31;
   reg [63:0] _RAND_32;
-  reg [31:0] _RAND_33;
-  reg [63:0] _RAND_34;
-  reg [63:0] _RAND_35;
-  reg [31:0] _RAND_36;
-  reg [63:0] _RAND_37;
-  reg [31:0] _RAND_38;
-  reg [63:0] _RAND_39;
-  reg [31:0] _RAND_40;
-  reg [63:0] _RAND_41;
-  reg [31:0] _RAND_42;
-  reg [63:0] _RAND_43;
 `endif // RANDOMIZE_REG_INIT
   wire  regfile_clock; // @[dpath.scala 143:23]
   wire  regfile_reset; // @[dpath.scala 143:23]
@@ -1263,8 +1252,6 @@ module Dpath(
   reg [63:0] exe_reg_inst; // @[dpath.scala 42:29]
   reg [63:0] exe_reg_pc; // @[dpath.scala 43:27]
   reg [4:0] exe_reg_wbaddr; // @[dpath.scala 44:27]
-  reg [4:0] exe_reg_rs1_addr; // @[dpath.scala 45:29]
-  reg [4:0] exe_reg_rs2_addr; // @[dpath.scala 46:29]
   reg [63:0] exe_alu_op1; // @[dpath.scala 47:29]
   reg [63:0] brjmp_offset; // @[dpath.scala 48:29]
   reg [63:0] exe_reg_rs2_data; // @[dpath.scala 49:29]
@@ -1280,17 +1267,12 @@ module Dpath(
   reg [63:0] mem_reg_inst; // @[dpath.scala 64:25]
   reg [63:0] mem_reg_alu_out; // @[dpath.scala 65:28]
   reg [4:0] mem_reg_wbaddr; // @[dpath.scala 66:27]
-  reg [4:0] mem_reg_rs1_addr; // @[dpath.scala 67:29]
-  reg [4:0] mem_reg_rs2_addr; // @[dpath.scala 68:29]
-  reg [63:0] mem_reg_op1_data; // @[dpath.scala 69:29]
-  reg [63:0] mem_reg_op2_data; // @[dpath.scala 70:29]
   reg  mem_reg_ctrl_rf_wen; // @[dpath.scala 72:36]
   reg [2:0] mem_reg_ctrl_wb_sel; // @[dpath.scala 76:32]
   reg [2:0] mem_reg_ctrl_mem_wid; // @[dpath.scala 77:37]
   reg [63:0] mem_reg_dram_data; // @[dpath.scala 79:34]
   reg  wb_reg_valid; // @[dpath.scala 82:29]
   reg [63:0] wb_reg_pc; // @[dpath.scala 83:22]
-  reg [63:0] wb_reg_inst; // @[dpath.scala 84:24]
   reg [4:0] wb_reg_wbaddr; // @[dpath.scala 85:26]
   reg [63:0] wb_reg_wbdata; // @[dpath.scala 86:26]
   reg  wb_reg_ctrl_rf_wen; // @[dpath.scala 87:35]
@@ -1412,10 +1394,6 @@ module Dpath(
   wire [63:0] _T_204 = _T_194 ? _T_197 : _T_203; // @[Mux.scala 98:16]
   wire [14:0] _GEN_54 = {{7'd0}, exe_reg_ctrl_mem_typ}; // @[dpath.scala 367:39]
   wire [14:0] _T_206 = _GEN_54 << exe_alu_out[2:0]; // @[dpath.scala 367:39]
-  reg [4:0] _T_214; // @[dpath.scala 381:12]
-  reg [63:0] _T_215; // @[dpath.scala 382:12]
-  reg [4:0] _T_216; // @[dpath.scala 383:12]
-  reg [63:0] _T_217; // @[dpath.scala 384:12]
   regfile regfile ( // @[dpath.scala 143:23]
     .clock(regfile_clock),
     .reset(regfile_reset),
@@ -1576,78 +1554,56 @@ initial begin
   exe_reg_pc = _RAND_6[63:0];
   _RAND_7 = {1{`RANDOM}};
   exe_reg_wbaddr = _RAND_7[4:0];
-  _RAND_8 = {1{`RANDOM}};
-  exe_reg_rs1_addr = _RAND_8[4:0];
-  _RAND_9 = {1{`RANDOM}};
-  exe_reg_rs2_addr = _RAND_9[4:0];
+  _RAND_8 = {2{`RANDOM}};
+  exe_alu_op1 = _RAND_8[63:0];
+  _RAND_9 = {2{`RANDOM}};
+  brjmp_offset = _RAND_9[63:0];
   _RAND_10 = {2{`RANDOM}};
-  exe_alu_op1 = _RAND_10[63:0];
-  _RAND_11 = {2{`RANDOM}};
-  brjmp_offset = _RAND_11[63:0];
-  _RAND_12 = {2{`RANDOM}};
-  exe_reg_rs2_data = _RAND_12[63:0];
+  exe_reg_rs2_data = _RAND_10[63:0];
+  _RAND_11 = {1{`RANDOM}};
+  exe_reg_ctrl_br_type = _RAND_11[3:0];
+  _RAND_12 = {1{`RANDOM}};
+  exe_reg_ctrl_alu_fun = _RAND_12[4:0];
   _RAND_13 = {1{`RANDOM}};
-  exe_reg_ctrl_br_type = _RAND_13[3:0];
+  exe_reg_ctrl_wb_sel = _RAND_13[2:0];
   _RAND_14 = {1{`RANDOM}};
-  exe_reg_ctrl_alu_fun = _RAND_14[4:0];
+  exe_reg_ctrl_rf_wen = _RAND_14[0:0];
   _RAND_15 = {1{`RANDOM}};
-  exe_reg_ctrl_wb_sel = _RAND_15[2:0];
+  exe_reg_ctrl_mem_fcn = _RAND_15[1:0];
   _RAND_16 = {1{`RANDOM}};
-  exe_reg_ctrl_rf_wen = _RAND_16[0:0];
+  exe_reg_ctrl_mem_typ = _RAND_16[7:0];
   _RAND_17 = {1{`RANDOM}};
-  exe_reg_ctrl_mem_fcn = _RAND_17[1:0];
+  exe_reg_ctrl_mem_wid = _RAND_17[2:0];
   _RAND_18 = {1{`RANDOM}};
-  exe_reg_ctrl_mem_typ = _RAND_18[7:0];
-  _RAND_19 = {1{`RANDOM}};
-  exe_reg_ctrl_mem_wid = _RAND_19[2:0];
-  _RAND_20 = {1{`RANDOM}};
-  mem_reg_valid = _RAND_20[0:0];
+  mem_reg_valid = _RAND_18[0:0];
+  _RAND_19 = {2{`RANDOM}};
+  mem_reg_pc = _RAND_19[63:0];
+  _RAND_20 = {2{`RANDOM}};
+  mem_reg_inst = _RAND_20[63:0];
   _RAND_21 = {2{`RANDOM}};
-  mem_reg_pc = _RAND_21[63:0];
-  _RAND_22 = {2{`RANDOM}};
-  mem_reg_inst = _RAND_22[63:0];
-  _RAND_23 = {2{`RANDOM}};
-  mem_reg_alu_out = _RAND_23[63:0];
+  mem_reg_alu_out = _RAND_21[63:0];
+  _RAND_22 = {1{`RANDOM}};
+  mem_reg_wbaddr = _RAND_22[4:0];
+  _RAND_23 = {1{`RANDOM}};
+  mem_reg_ctrl_rf_wen = _RAND_23[0:0];
   _RAND_24 = {1{`RANDOM}};
-  mem_reg_wbaddr = _RAND_24[4:0];
+  mem_reg_ctrl_wb_sel = _RAND_24[2:0];
   _RAND_25 = {1{`RANDOM}};
-  mem_reg_rs1_addr = _RAND_25[4:0];
-  _RAND_26 = {1{`RANDOM}};
-  mem_reg_rs2_addr = _RAND_26[4:0];
-  _RAND_27 = {2{`RANDOM}};
-  mem_reg_op1_data = _RAND_27[63:0];
+  mem_reg_ctrl_mem_wid = _RAND_25[2:0];
+  _RAND_26 = {2{`RANDOM}};
+  mem_reg_dram_data = _RAND_26[63:0];
+  _RAND_27 = {1{`RANDOM}};
+  wb_reg_valid = _RAND_27[0:0];
   _RAND_28 = {2{`RANDOM}};
-  mem_reg_op2_data = _RAND_28[63:0];
+  wb_reg_pc = _RAND_28[63:0];
   _RAND_29 = {1{`RANDOM}};
-  mem_reg_ctrl_rf_wen = _RAND_29[0:0];
-  _RAND_30 = {1{`RANDOM}};
-  mem_reg_ctrl_wb_sel = _RAND_30[2:0];
+  wb_reg_wbaddr = _RAND_29[4:0];
+  _RAND_30 = {2{`RANDOM}};
+  wb_reg_wbdata = _RAND_30[63:0];
   _RAND_31 = {1{`RANDOM}};
-  mem_reg_ctrl_mem_wid = _RAND_31[2:0];
+  wb_reg_ctrl_rf_wen = _RAND_31[0:0];
   _RAND_32 = {2{`RANDOM}};
-  mem_reg_dram_data = _RAND_32[63:0];
-  _RAND_33 = {1{`RANDOM}};
-  wb_reg_valid = _RAND_33[0:0];
-  _RAND_34 = {2{`RANDOM}};
-  wb_reg_pc = _RAND_34[63:0];
-  _RAND_35 = {2{`RANDOM}};
-  wb_reg_inst = _RAND_35[63:0];
-  _RAND_36 = {1{`RANDOM}};
-  wb_reg_wbaddr = _RAND_36[4:0];
-  _RAND_37 = {2{`RANDOM}};
-  wb_reg_wbdata = _RAND_37[63:0];
-  _RAND_38 = {1{`RANDOM}};
-  wb_reg_ctrl_rf_wen = _RAND_38[0:0];
-  _RAND_39 = {2{`RANDOM}};
-  _T_181 = _RAND_39[63:0];
-  _RAND_40 = {1{`RANDOM}};
-  _T_214 = _RAND_40[4:0];
-  _RAND_41 = {2{`RANDOM}};
-  _T_215 = _RAND_41[63:0];
-  _RAND_42 = {1{`RANDOM}};
-  _T_216 = _RAND_42[4:0];
-  _RAND_43 = {2{`RANDOM}};
-  _T_217 = _RAND_43[63:0];
+  _T_181 = _RAND_32[63:0];
 `endif // RANDOMIZE_REG_INIT
   `endif // RANDOMIZE
 end // initial
@@ -1728,16 +1684,6 @@ end // initial
         exe_reg_wbaddr <= 5'h0;
       end else begin
         exe_reg_wbaddr <= dec_wbaddr;
-      end
-    end
-    if (!(io_ctl_dec_stall)) begin
-      if (_T) begin
-        exe_reg_rs1_addr <= dec_rs1_addr;
-      end
-    end
-    if (!(io_ctl_dec_stall)) begin
-      if (_T) begin
-        exe_reg_rs2_addr <= dec_rs2_addr;
       end
     end
     if (!(io_ctl_dec_stall)) begin
@@ -1941,10 +1887,6 @@ end // initial
       mem_reg_alu_out <= alu_io_res;
     end
     mem_reg_wbaddr <= exe_reg_wbaddr;
-    mem_reg_rs1_addr <= exe_reg_rs1_addr;
-    mem_reg_rs2_addr <= exe_reg_rs2_addr;
-    mem_reg_op1_data <= exe_alu_op1;
-    mem_reg_op2_data <= brjmp_offset;
     if (reset) begin
       mem_reg_ctrl_rf_wen <= 1'h0;
     end else begin
@@ -1967,7 +1909,6 @@ end // initial
       wb_reg_valid <= mem_reg_valid;
     end
     wb_reg_pc <= mem_reg_pc;
-    wb_reg_inst <= mem_reg_inst;
     wb_reg_wbaddr <= mem_reg_wbaddr;
     if (_T_177) begin
       if (_T_140) begin
@@ -1994,10 +1935,6 @@ end // initial
       wb_reg_ctrl_rf_wen <= mem_reg_ctrl_rf_wen;
     end
     _T_181 <= mem_reg_inst;
-    _T_214 <= mem_reg_rs1_addr;
-    _T_215 <= mem_reg_op1_data;
-    _T_216 <= mem_reg_rs2_addr;
-    _T_217 <= mem_reg_op2_data;
     `ifndef SYNTHESIS
     `ifdef PRINTF_COND
       if (`PRINTF_COND) begin
@@ -2091,7 +2028,7 @@ end // initial
       if (`PRINTF_COND) begin
     `endif
         if (_T_10) begin
-          $fwrite(32'h80000002,"pc=[%x] W[r%d=%x][%d] Op1=[r%d][%x] Op2=[r%d][%x] inst=[%x]\n\n",wb_reg_pc,wb_reg_wbaddr,wb_reg_wbdata,wb_reg_ctrl_rf_wen,_T_214,_T_215,_T_216,_T_217,wb_reg_inst); // @[dpath.scala 376:9]
+          $fwrite(32'h80000002,"pc=[%x]\n",wb_reg_pc); // @[dpath.scala 376:9]
         end
     `ifdef PRINTF_COND
       end

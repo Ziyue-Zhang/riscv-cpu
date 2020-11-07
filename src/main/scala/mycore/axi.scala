@@ -1,4 +1,4 @@
-package njucore
+//package njucore
 
 /*import chisel3._
 import chisel3.util._

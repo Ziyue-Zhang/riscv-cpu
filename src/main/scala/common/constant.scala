@@ -5,7 +5,9 @@ import chisel3.util.log2Ceil
 
 object constant extends 
     RiscvConstants with 
-    MemoryOpConstants {
+    MemoryOpConstants with
+    CSRConstants with
+    CSRmap{
 }
 
 trait RiscvConstants {
@@ -33,13 +35,6 @@ trait RiscvConstants {
 
   val MTVEC = 0x100
   val START_ADDR = "h80000000".U //MTVEC + 0x100
-
-  val SZ_PRV = 2
-  val PRV_U = 0
-  val PRV_S = 1
-  val PRV_H = 2
-  val PRV_M = 3
-
 
   val PC_4   = 0.asUInt(2.W)  // PC + 4
   val PC_BRJMP  = 1.asUInt(2.W)  // brjmp_target
@@ -152,4 +147,160 @@ trait MemoryOpConstants {
    val MWD_WU = 5.asUInt(3.W)
    val MWD_D  = 6.asUInt(3.W)
    val MWD_X  = 0.asUInt(3.W)
+}
+
+trait PRV 
+{
+    val prv_sz = 2.W
+    val PRV_U = 0.U(prv_sz)
+    val PRV_S = 1.U(prv_sz)
+    val PRV_M = 3.U(prv_sz)
+}
+
+trait CSRConstants extends PRV
+{
+   //csr operation
+   val csr_op_size = 3.W 
+   val csr_x     = 0.U(csr_op_size)
+   val csr_n     = 0.U(csr_op_size)
+   val csr_r     = 1.U(csr_op_size)
+   val csr_w     = 2.U(csr_op_size)
+   val csr_c     = 3.U(csr_op_size)
+   val csr_s     = 4.U(csr_op_size)
+   val csr_prv   = 5.U(csr_op_size)
+
+   //csr reg index size
+   val csr_add_size = 12
+
+   val csr_LSB = 20
+   val csr_MSB = 31
+
+   val MTVEC_ADDR = 0x8000c09cL
+
+   //for RT-Thread
+   val mtimecmp_addr = 0x40704000L
+   val mtime_addr    = 0x4070bff8L
+
+   //for am-test
+   // val mtimecmp_addr = 0x38004000L
+   // val mtime_addr    = 0x3800bff8L
+
+   val rs1_LSB = 15
+   val rs1_MSB = 19
+   val rs2_LSB = 20
+   val rs2_MSB = 24
+}
+
+object Cause 
+{
+   // interrupt
+   val m_soft_interrupt    = 3.U(64.W)
+   val m_timer_interrupt   = 7.U(64.W)
+   val m_ext_interrupt     = 11.U(64.W) 
+
+   val intr_priority_table = Seq(
+       m_ext_interrupt,
+       m_soft_interrupt,
+       m_timer_interrupt
+   )
+
+   //exception
+   //can find in risc-v-reader-chinese-v2p1 picture 10.3
+   val inst_addr_misalign  =   0.U(64.W)
+   val inst_access_falut   =   1.U(64.W)
+   val illegal_inst        =   2.U(64.W)
+   val breakpoint          =   3.U(64.W)
+   val load_addr_misalign  =   4.U(64.W)
+   val load_access_fault   =   5.U(64.W)
+   val store_addr_misalign =   6.U(64.W)
+   val store_access_fault  =   7.U(64.W)
+   val ecall_u             =   8.U(64.W)
+   val ecall_s             =   9.U(64.W)
+   val ecall_m             =   11.U(64.W)
+   val inst_page_fault    =   12.U(64.W)
+   val load_page_fault     =   13.U(64.W)
+   val store_page_fault    =   15.U(64.W)
+
+   val exc_priority_table = Seq(
+       breakpoint,
+       inst_page_fault,
+       inst_access_falut,
+       illegal_inst,
+       inst_addr_misalign,
+       ecall_m,
+       ecall_s,
+       ecall_u,
+       store_addr_misalign,
+       load_addr_misalign,
+       store_page_fault,
+       load_page_fault,
+       store_access_fault,
+       load_access_fault
+   )
+}
+
+object CSR
+{
+  // commands
+  val SZ = 3.W
+  val X = 0.asUInt(SZ)
+  val N = 0.asUInt(SZ)
+  val W = 1.asUInt(SZ)
+  val S = 2.asUInt(SZ)
+  val C = 3.asUInt(SZ)
+  val I = 4.asUInt(SZ)
+  val R = 5.asUInt(SZ)
+}
+
+trait CSRmap
+{
+    //machine mode infomation registers
+    val mvendorid = 0xf11
+    val marchid = 0xf12
+    val mimpid = 0xf13
+    val mhartid = 0xf14
+
+    //machine mode trap setup registers
+    val mstatus = 0x300
+    val misa = 0x301
+    val medelege = 0x302
+    val midelege = 0x303
+    val mie = 0x304
+    val mtvec = 0x305
+    val mcounteren = 0x306
+    
+    //machine mode trap handling registers
+    val mscratch = 0x340
+    val mepc = 0x341
+    val mcause = 0x342
+    val mtval = 0x343
+    val mip = 0x344
+
+    //machine mode physical memory protection 
+    val pmpcfg0 = 0x3a0
+    val pmpcfg1 = 0x3a1
+    val pmpaddr0 = 0x3b0
+    val pmpaddr1 = 0x3b1
+    val pmpaddr3 = 0x3b2
+    val pmpaddr4 = 0x3b3
+    val pmpaddr5 = 0x3b4
+    val pmpaddr6 = 0x3b5
+    val pmpaddr7 = 0x3b6
+    val pmpaddr8 = 0x3b7
+    val pmpaddr9 = 0x3b8
+    val pmpaddr10 = 0x3b9
+    val pmpaddr11 = 0x3ba
+    val pmpaddr12 = 0x3bb
+    val pmpaddr13 = 0x3bc
+    val pmpaddr14 = 0x3bd
+    val pmpaddr15 = 0x3be
+
+    //machine mode timers
+    val mcycle = 0xb00
+    val minstret = 0xb02
+    val mhpmcounter_start = 0xb03
+    val mhpmcounter_number = 29
+    val mcounterinhibit = 0x320
+    val mhpmevent_start = 0x323
+    val mhpmevent_number = 29
 }
