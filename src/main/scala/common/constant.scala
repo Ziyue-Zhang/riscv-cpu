@@ -194,14 +194,20 @@ trait CSRConstants extends PRV
 object Cause 
 {
    // interrupt
+   val s_soft_interrupt    = 1.U(64.W)
    val m_soft_interrupt    = 3.U(64.W)
+   val s_timer_interrupt   = 5.U(64.W)
    val m_timer_interrupt   = 7.U(64.W)
+   val s_ext_interrupt     = 9.U(64.W)
    val m_ext_interrupt     = 11.U(64.W) 
 
    val intr_priority_table = Seq(
        m_ext_interrupt,
        m_soft_interrupt,
-       m_timer_interrupt
+       m_timer_interrupt,
+       s_ext_interrupt,
+       s_soft_interrupt,
+       s_timer_interrupt
    )
 
    //exception
@@ -217,7 +223,7 @@ object Cause
    val ecall_u             =   8.U(64.W)
    val ecall_s             =   9.U(64.W)
    val ecall_m             =   11.U(64.W)
-   val inst_page_fault    =   12.U(64.W)
+   val inst_page_fault     =   12.U(64.W)
    val load_page_fault     =   13.U(64.W)
    val store_page_fault    =   15.U(64.W)
 

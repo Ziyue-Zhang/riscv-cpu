@@ -13,6 +13,7 @@ class DatToCtlIo extends Bundle() {
   val exe_br_lt = Output(Bool())
   val exe_br_ltu = Output(Bool())
   val exe_br_type = Output(UInt(4.W))
+  val csr_eret = Output(Bool())
 }
 
 class DpathIo extends Bundle() {
@@ -31,52 +32,52 @@ class Dpath extends Module {
   // Pipeline State Registers
 
   // Instruction Fetch State
-  val if_reg_pc = RegInit(UInt(XLEN.W), START_ADDR)
+  val if_reg_pc            = RegInit(UInt(XLEN.W), START_ADDR)
 
   // Instruction Decode State
-  val dec_reg_valid = RegInit(false.B)
-  val dec_reg_inst = RegInit(BUBBLE)
-  val dec_reg_pc = RegInit(0.asUInt(XLEN.W))
+  val dec_reg_valid        = RegInit(false.B)
+  val dec_reg_inst         = RegInit(BUBBLE)
+  val dec_reg_pc           = RegInit(0.asUInt(XLEN.W))
 
-  val exe_reg_valid = RegInit(false.B)
-  val exe_reg_inst = RegInit(BUBBLE)
-  val exe_reg_pc = RegInit(0.asUInt(XLEN.W))
-  val exe_reg_wbaddr = Reg(UInt(5.W))
-  val exe_reg_rs1_addr = Reg(UInt(5.W))
-  val exe_reg_rs2_addr = Reg(UInt(5.W))
-  val exe_reg_op1_data = Reg(UInt(XLEN.W))
-  val exe_reg_op2_data = Reg(UInt(XLEN.W))
-  val exe_reg_rs2_data = Reg(UInt(XLEN.W))
-  val exe_reg_ctrl_br_type  = RegInit(BR_N)
+  val exe_reg_valid        = RegInit(false.B)
+  val exe_reg_inst         = RegInit(BUBBLE)
+  val exe_reg_pc           = RegInit(0.asUInt(XLEN.W))
+  val exe_reg_wbaddr       = Reg(UInt(5.W))
+  val exe_reg_rs1_addr     = Reg(UInt(5.W))
+  val exe_reg_rs2_addr     = Reg(UInt(5.W))
+  val exe_reg_op1_data     = Reg(UInt(XLEN.W))
+  val exe_reg_op2_data     = Reg(UInt(XLEN.W))
+  val exe_reg_rs2_data     = Reg(UInt(XLEN.W))
+  val exe_reg_ctrl_br_type = RegInit(BR_N)
   val exe_reg_ctrl_op2_sel = Reg(UInt())
   val exe_reg_ctrl_alu_fun = Reg(UInt())
-  val exe_reg_ctrl_wb_sel = Reg(UInt())
-  val exe_reg_ctrl_rf_wen = RegInit(false.B)
-  val exe_reg_ctrl_mem_val  = RegInit(false.B)
-  val exe_reg_ctrl_mem_fcn  = RegInit(M_X)
-  val exe_reg_ctrl_mem_typ  = RegInit(MT_X)
+  val exe_reg_ctrl_wb_sel  = Reg(UInt())
+  val exe_reg_ctrl_rf_wen  = RegInit(false.B)
+  val exe_reg_ctrl_mem_val = RegInit(false.B)
+  val exe_reg_ctrl_mem_fcn = RegInit(M_X)
+  val exe_reg_ctrl_mem_typ = RegInit(MT_X)
   val exe_reg_ctrl_mem_wid = RegInit(MWD_X)
   val exe_reg_ctrl_csr_cmd = RegInit(CSR.N)
 
   // Memory State
-  val mem_reg_valid = RegInit(false.B)
-  val mem_reg_pc = Reg(UInt(XLEN.W))
-  val mem_reg_inst = Reg(UInt(XLEN.W))
-  val mem_reg_alu_out = Reg(UInt(XLEN.W))
-  val mem_reg_wbaddr = Reg(UInt())
-  val mem_reg_rs1_addr = Reg(UInt())
-  val mem_reg_rs2_addr = Reg(UInt())
-  val mem_reg_op1_data = Reg(UInt(XLEN.W))
-  val mem_reg_op2_data = Reg(UInt(XLEN.W))
-  val mem_reg_rs2_data = Reg(UInt(XLEN.W))
-  val mem_reg_ctrl_rf_wen = RegInit(false.B)
-  val mem_reg_ctrl_mem_val  = RegInit(false.B)
-  val mem_reg_ctrl_mem_fcn  = RegInit(M_X)
-  val mem_reg_ctrl_mem_typ  = RegInit(MT_X)
-  val mem_reg_ctrl_wb_sel = Reg(UInt())
+  val mem_reg_valid        = RegInit(false.B)
+  val mem_reg_pc           = Reg(UInt(XLEN.W))
+  val mem_reg_inst         = Reg(UInt(XLEN.W))
+  val mem_reg_alu_out      = Reg(UInt(XLEN.W))
+  val mem_reg_wbaddr       = Reg(UInt())
+  val mem_reg_rs1_addr     = Reg(UInt())
+  val mem_reg_rs2_addr     = Reg(UInt())
+  val mem_reg_op1_data     = Reg(UInt(XLEN.W))
+  val mem_reg_op2_data     = Reg(UInt(XLEN.W))
+  val mem_reg_rs2_data     = Reg(UInt(XLEN.W))
+  val mem_reg_ctrl_rf_wen  = RegInit(false.B)
+  val mem_reg_ctrl_mem_val = RegInit(false.B)
+  val mem_reg_ctrl_mem_fcn = RegInit(M_X)
+  val mem_reg_ctrl_mem_typ = RegInit(MT_X)
+  val mem_reg_ctrl_wb_sel  = Reg(UInt())
   val mem_reg_ctrl_mem_wid = RegInit(MWD_X)
   val mem_reg_ctrl_csr_cmd = RegInit(CSR.N)
-  val mem_reg_dram_data = RegInit(0.asUInt(XLEN.W))
+  val mem_reg_dram_data    = RegInit(0.asUInt(XLEN.W))
 
   // Writeback State
   val wb_reg_valid = RegInit(false.B)
@@ -92,9 +93,9 @@ class Dpath extends Module {
   val if_pc_next = Wire(UInt(XLEN.W)) // next_pc
   val exe_brjmp_target = Wire(UInt(XLEN.W))
   val exe_jump_reg_target = Wire(UInt(XLEN.W))
-  //  val exception_target    = Wire(UInt(XLEN.W))
+  val exception_target    = Wire(UInt(XLEN.W))
 
-  when (!io.ctl.dec_stall)
+  when ((!io.ctl.dec_stall && !io.ctl.full_stall) || io.ctl.pipeline_kill)
   {
       if_reg_pc := if_pc_next
   }
@@ -105,13 +106,24 @@ class Dpath extends Module {
                 Mux(io.ctl.exe_pc_sel === PC_BRJMP,  exe_brjmp_target,
                 Mux(io.ctl.exe_pc_sel === PC_JALR,   exe_jump_reg_target,
                 BUBBLE))) 
-  
+
+  when (io.ctl.fencei && io.ctl.exe_pc_sel === PC_4 &&
+         !io.ctl.dec_stall && !io.ctl.full_stall && !io.ctl.pipeline_kill)
+  {
+      if_pc_next := if_reg_pc
+  }
+
   io.inst_readIO.addr := if_reg_pc
   io.inst_readIO.en := true.B
 
   val if_inst = io.inst_readIO.data
-
-  when (!io.ctl.dec_stall)
+  
+  when (io.ctl.pipeline_kill)
+  {
+      dec_reg_valid := false.B
+      dec_reg_inst := BUBBLE
+  }
+  .elsewhen (!io.ctl.dec_stall && !io.ctl.full_stall)
   {
       when (io.ctl.if_kill)
       {
@@ -148,7 +160,6 @@ class Dpath extends Module {
   regfile.io.waddr := wb_reg_wbaddr 
   regfile.io.wdata := wb_reg_wbdata
   regfile.io.wen   := wb_reg_ctrl_rf_wen
-
 
   // immediates
   val imm_itype = dec_reg_inst(31, 20)
@@ -199,7 +210,7 @@ class Dpath extends Module {
   dec_op2_data := MuxCase(dec_alu_op2, Array(
     ((exe_reg_wbaddr === dec_rs2_addr) && (dec_rs2_addr =/= 0.U) && exe_reg_ctrl_rf_wen && (io.ctl.op2_sel === OP2_RS2)) -> exe_alu_out,
     ((mem_reg_wbaddr === dec_rs2_addr) && (dec_rs2_addr =/= 0.U) && mem_reg_ctrl_rf_wen && (io.ctl.op2_sel === OP2_RS2)) -> mem_wbdata,
-    ((wb_reg_wbaddr === dec_rs2_addr)  && (dec_rs2_addr =/= 0.U) && wb_reg_ctrl_rf_wen  && (io.ctl.op2_sel === OP2_RS2)) -> wb_reg_wbdata
+    ((wb_reg_wbaddr  === dec_rs2_addr) && (dec_rs2_addr =/= 0.U) && wb_reg_ctrl_rf_wen  && (io.ctl.op2_sel === OP2_RS2)) -> wb_reg_wbdata
   ))
 
   dec_rs2_data := MuxCase(rf_rs2_data, Array(
@@ -209,7 +220,7 @@ class Dpath extends Module {
   ))
 
 
-  when (io.ctl.dec_stall)
+  when ((io.ctl.dec_stall && !io.ctl.full_stall) || io.ctl.pipeline_kill)
   {
       // (kill exe stage)
       // insert NOP (bubble) into Execute stage on front-end stall (e.g., hazard clearing)
@@ -287,31 +298,59 @@ class Dpath extends Module {
   exe_jump_reg_target := exe_adder_out
 
   val exe_pc_plus4 = (exe_reg_pc + 4.U) (XLEN - 1, 0)
-
-  mem_reg_valid         := exe_reg_valid
-  mem_reg_pc            := exe_reg_pc
-  mem_reg_inst          := exe_reg_inst
-  mem_reg_alu_out := MuxCase(exe_alu_out, Array(
-      (exe_reg_ctrl_wb_sel === WB_PC4) -> exe_pc_plus4
-  ))
-  mem_reg_wbaddr        := exe_reg_wbaddr
-  mem_reg_rs1_addr      := exe_reg_rs1_addr
-  mem_reg_rs2_addr      := exe_reg_rs2_addr
-  mem_reg_op1_data      := exe_reg_op1_data
-  mem_reg_op2_data      := exe_reg_op2_data
-  mem_reg_rs2_data      := exe_reg_rs2_data
-  mem_reg_ctrl_rf_wen   := exe_reg_ctrl_rf_wen
-  mem_reg_ctrl_mem_val  := exe_reg_ctrl_mem_val
-  mem_reg_ctrl_mem_fcn  := exe_reg_ctrl_mem_fcn
-  mem_reg_ctrl_mem_typ  := exe_reg_ctrl_mem_typ
-  mem_reg_ctrl_mem_wid  := exe_reg_ctrl_mem_wid
-  mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
-  mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
-
+  
+  when (io.ctl.pipeline_kill)
+  {
+      mem_reg_valid         := false.B
+      mem_reg_inst          := BUBBLE
+      mem_reg_ctrl_rf_wen   := false.B
+      mem_reg_ctrl_mem_val  := false.B
+      mem_reg_ctrl_csr_cmd  := false.B
+  }
+  .elsewhen (!io.ctl.full_stall)
+  {
+      mem_reg_valid         := exe_reg_valid
+      mem_reg_pc            := exe_reg_pc
+      mem_reg_inst          := exe_reg_inst
+      mem_reg_alu_out := MuxCase(exe_alu_out, Array(
+          (exe_reg_ctrl_wb_sel === WB_PC4) -> exe_pc_plus4
+      ))
+      mem_reg_wbaddr        := exe_reg_wbaddr
+      mem_reg_rs1_addr      := exe_reg_rs1_addr
+      mem_reg_rs2_addr      := exe_reg_rs2_addr
+      mem_reg_op1_data      := exe_reg_op1_data
+      mem_reg_op2_data      := exe_reg_op2_data
+      mem_reg_rs2_data      := exe_reg_rs2_data
+      mem_reg_ctrl_rf_wen   := exe_reg_ctrl_rf_wen
+      mem_reg_ctrl_mem_val  := exe_reg_ctrl_mem_val
+      mem_reg_ctrl_mem_fcn  := exe_reg_ctrl_mem_fcn
+      mem_reg_ctrl_mem_typ  := exe_reg_ctrl_mem_typ
+      mem_reg_ctrl_mem_wid  := exe_reg_ctrl_mem_wid
+      mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
+      mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
+  }
   printf("EXE: valid = %d pc=[%x] inst=[%x] bj_target = [%x]\n", exe_reg_valid, exe_reg_pc, exe_reg_inst, exe_brjmp_target)
  
   //********************************************************************************************************************
   // Memory Stage
+  
+  // Control Status Registers
+   // The CSRFile can redirect the PC so it's easiest to put this in Execute for now.
+  val csr = Module(new CSRfile)
+
+  csr.io.inst := mem_reg_inst
+  csr.io.csr_op := mem_reg_ctrl_csr_cmd
+  csr.io.data_in := mem_reg_alu_out
+  csr.io.has_exception := false.B
+  csr.io.is_retire := false.B
+  csr.io.has_stall := io.ctl.full_stall
+  csr.io.in_mem_pc := mem_reg_pc
+  csr.io.in_exe_pc := exe_reg_pc
+  csr.io.in_dec_pc := dec_reg_pc
+  csr.io.in_if_pc  := if_reg_pc
+
+  io.dat.csr_eret  := csr.io.is_redir
+  exception_target := csr.io.redir_target
 
   io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
   io.data_readIO.addr  := exe_alu_out.asUInt()
