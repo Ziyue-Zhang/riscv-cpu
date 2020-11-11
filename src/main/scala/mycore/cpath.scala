@@ -250,5 +250,7 @@ class Cpath extends Module{
   val csr_ren = ((cs_csr_cmd =/= csr_x) && (cs_csr_cmd =/= csr_prv))
   io.ctl.csr_cmd := Mux(csr_ren, csr_r, cs_csr_cmd)
 
-  printf("CTRL : inst = %x, ifkill = %d, deckill = %d, stall = %d\n",io.dat.dec_inst, ifkill, deckill, stall)
+  when(DEBUG){
+    printf("CTRL : inst = %x, ifkill = %d, deckill = %d, stall = %d\n",io.dat.dec_inst, ifkill, deckill, stall)
+  }
 }

@@ -11,6 +11,8 @@ object constant extends
 }
 
 trait RiscvConstants {
+  val DEBUG   = false.B
+
   val XLEN    = 64
   val WIDE    = log2Ceil(XLEN)
   val NUM_REG = 32

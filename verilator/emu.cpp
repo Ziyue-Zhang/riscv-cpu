@@ -40,7 +40,7 @@ Emu::~Emu()
 void Emu::step(int num)
 {
     for(int i = 100; i > 0; i--){
-        printf("cycle = %d \n", emu_cycles);
+        //printf("cycle = %d \n", emu_cycles);
         emu_simtop->clock = 0;
         emu_simtop->eval();
 
@@ -57,7 +57,7 @@ void Emu::step(int num)
             extern int difftest_step(Emu* emu);
             int temp = difftest_step(this);
             assert(temp==0);
-            printf("***************************************\n");
+            //printf("***************************************\n");
             return;
         }
     }

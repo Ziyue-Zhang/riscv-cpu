@@ -45,6 +45,7 @@ VM_USER_CLASSES = \
 	emu \
 	main \
 	ram \
+	uart \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
@@ -67,6 +68,8 @@ emu.o: ./verilator/emu.cpp
 main.o: ./verilator/main.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 ram.o: ./verilator/ram.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+uart.o: ./verilator/uart.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)

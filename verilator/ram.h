@@ -2,6 +2,7 @@
 #define __RAM_H__
 
 #include "common.h"
+#include "uart.h"
 
 class Ram {
 public:
@@ -15,6 +16,7 @@ public:
 
 private:
   reg_t ram[RAMSIZE / sizeof(reg_t)];
+  Uart* uart;
   int img_size;
   int ram_size; 
 };

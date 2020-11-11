@@ -30,5 +30,7 @@ class regfile extends Module{
    
   BoringUtils.addSource(VecInit((0 to NUM_REG-1).map(i => regfile(i.U))), "diffTestRegfile")
   
-  printf("RF: rdata1(%d)=[%x] rdata2(%d)=[%x] wdata(%d)=[%x] wen=%d\n", io.rs1_addr, io.rs1_data, io.rs1_addr, io.rs2_data, io.waddr, io.wdata, io.wen)
+  when(DEBUG){
+    printf("RF: rdata1(%d)=[%x] rdata2(%d)=[%x] wdata(%d)=[%x] wen=%d\n", io.rs1_addr, io.rs1_data, io.rs1_addr, io.rs2_data, io.waddr, io.wdata, io.wen)
+  }
 }

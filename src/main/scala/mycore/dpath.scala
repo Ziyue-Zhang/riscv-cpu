@@ -141,8 +141,9 @@ class Dpath extends Module {
   }
 
   //DEBUG:
-  printf("IF : pc=[%x] inst=[%x] if_pc_next=[%x] pc_sel=[%d] e_bj_pc=[%x]\n", if_reg_pc, if_inst, if_pc_next, io.ctl.exe_pc_sel, exe_brjmp_target)
-
+  when(DEBUG){
+    printf("IF : pc=[%x] inst=[%x] if_pc_next=[%x] pc_sel=[%d] e_bj_pc=[%x]\n", if_reg_pc, if_inst, if_pc_next, io.ctl.exe_pc_sel, exe_brjmp_target)
+  }
 
   //********************************************************************************************************************
   // Decode Stage
@@ -275,8 +276,9 @@ class Dpath extends Module {
       }
    }
 
-
-  printf("DEC: valid = %d pc=[%x] inst=[%x] op1=[%x] alu2=[%x] op2=[%x]\n", dec_reg_valid, dec_reg_pc, dec_reg_inst, dec_op1_data, dec_alu_op2, dec_op2_data)
+  when(DEBUG){
+    printf("DEC: valid = %d pc=[%x] inst=[%x] op1=[%x] alu2=[%x] op2=[%x]\n", dec_reg_valid, dec_reg_pc, dec_reg_inst, dec_op1_data, dec_alu_op2, dec_op2_data)
+  }
 
   //********************************************************************************************************************
   // Execute Stage
@@ -289,7 +291,6 @@ class Dpath extends Module {
   alu.io.src1 := exe_alu_op1
   alu.io.src2 := exe_alu_op2
   alu_stall := alu.io.stall
-  printf("alu_stall = %d\n",alu_stall)
   exe_alu_out := MuxCase(alu.io.res, Array(
       (exe_reg_ctrl_wb_sel === WB_ALUW)-> Cat(Fill(32, alu.io.res(31)), alu.io.res(31,0)),
   ))
@@ -332,8 +333,11 @@ class Dpath extends Module {
       mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
       mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
   }
-  printf("EXE: valid = %d pc=[%x] inst=[%x] bj_target = [%x]\n", exe_reg_valid, exe_reg_pc, exe_reg_inst, exe_brjmp_target)
- 
+  
+  when(DEBUG){
+    printf("EXE: valid = %d pc=[%x] inst=[%x] bj_target = [%x]\n", exe_reg_valid, exe_reg_pc, exe_reg_inst, exe_brjmp_target)
+  }
+
   //********************************************************************************************************************
   // Memory Stage
   
@@ -358,7 +362,9 @@ class Dpath extends Module {
   io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
   io.data_readIO.addr  := exe_alu_out.asUInt()
   mem_reg_dram_data    := io.data_readIO.data
-  printf("MEM read data = [%x]\n", mem_reg_dram_data)
+  when(DEBUG){
+    printf("MEM read data = [%x]\n", mem_reg_dram_data)
+  }
 
   val mem_data = MuxCase(mem_reg_dram_data, Array(
     (mem_reg_ctrl_mem_wid === MWD_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
@@ -374,8 +380,10 @@ class Dpath extends Module {
   mem_wbdata := MuxCase(mem_reg_alu_out, Array(
     (mem_reg_ctrl_wb_sel === WB_MEM) -> mem_data
   ))
-
-  printf("MEM: valid = %d pc=[%x] inst=[%x] wb_sel=[%d] wbdata=[%x]\n", mem_reg_valid, mem_reg_pc, mem_reg_inst, mem_reg_ctrl_wb_sel, mem_wbdata)
+ 
+  when(DEBUG){
+    printf("MEM: valid = %d pc=[%x] inst=[%x] wb_sel=[%d] wbdata=[%x]\n", mem_reg_valid, mem_reg_pc, mem_reg_inst, mem_reg_ctrl_wb_sel, mem_wbdata)
+  }
 
   //********************************************************************************************************************
   // Writeback Stage
@@ -386,8 +394,9 @@ class Dpath extends Module {
     wb_reg_wbdata := mem_wbdata
     wb_reg_ctrl_rf_wen := mem_reg_ctrl_rf_wen
 
-
-  printf("WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n", wb_reg_valid, wb_reg_pc, RegNext(mem_reg_inst), wb_reg_wbdata, wb_reg_wbaddr)
+  when(DEBUG){
+    printf("WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n", wb_reg_valid, wb_reg_pc, RegNext(mem_reg_inst), wb_reg_wbdata, wb_reg_wbaddr)
+  }
 
   //********************************************************************************************************************
   // External Signals
@@ -407,15 +416,18 @@ class Dpath extends Module {
   ))    
   val write_mask = Wire(UInt(8.W))
   write_mask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
-  printf("store: mem_typ=[%x] offset=[%x]\n",exe_reg_ctrl_mem_typ,exe_alu_out(2,0))
 
   io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
   io.data_writeIO.addr := exe_alu_out.asUInt()   
   io.data_writeIO.data := write_data     
-  io.data_writeIO.mask := write_mask    
-  printf("store:addr = [%x] en=%d data = [%x] mask = %b\n ", io.data_writeIO.addr, io.data_writeIO.en, io.data_writeIO.data, io.data_writeIO.mask)
+  io.data_writeIO.mask := write_mask
+  when(DEBUG){    
+    printf("store:addr = [%x] en=%d data = [%x] mask = %b\n ", io.data_writeIO.addr, io.data_writeIO.en, io.data_writeIO.data, io.data_writeIO.mask)
+  }
 
-  printf("pc=[%x]\n", wb_reg_pc)
+  when(DEBUG){
+    printf("pc=[%x]\n", wb_reg_pc)
+  }
 
   BoringUtils.addSource(wb_reg_pc, "diffTestPC")
   BoringUtils.addSource(wb_reg_valid, "diffTestValid")  

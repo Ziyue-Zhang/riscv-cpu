@@ -19,6 +19,7 @@ Ram::Ram(char* imgPath) {
   assert(ret == 1 && "Can not read image file.");
   fclose(fp);
 
+  uart = new Uart();
 }
 
 void* Ram::get_img_start()
@@ -36,7 +37,7 @@ inst_t Ram::InstRead(reg_t addr, bool en){
   if(!en){
     return 0;
   }
-  printf("inst read addr = 0x%016lx \n", addr);
+  //printf("inst read addr = 0x%016lx \n", addr);
   assert(ADDR_START <= addr &&
       addr <= ADDR_START + ram_size &&
       "read addr out of range");
@@ -47,12 +48,19 @@ reg_t Ram::DataRead(reg_t addr, bool en){
   if(!en){
     return 0;
   }
-  printf("data read addr = 0x%016lx data = 0x%016lx\n", addr,
-    ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8));
-  assert(ADDR_START <= addr &&
+  /*printf("data read addr = 0x%016lx data = 0x%016lx\n", addr,
+    ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8));*/
+  if((ADDR_START <= addr) && (addr < ADDR_START + ram_size)){
+    return ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8);
+  }
+  else if((UART0_CTRL_ADDR <= addr) && (addr < UART0_CTRL_ADDR + UART0_CTRL_SIZE)) {
+    return uart->read(addr);
+  }
+  else{
+    assert(ADDR_START <= addr &&
       addr <= ADDR_START + ram_size &&
       "read data addr out of range");
-  return ram[(addr - ADDR_START) / sizeof(reg_t)] >> ((addr % sizeof(reg_t)) * 8);
+  }
 }
 
 void Ram::DataWrite(reg_t addr, reg_t data, bool en, mask_t mask)
@@ -60,9 +68,9 @@ void Ram::DataWrite(reg_t addr, reg_t data, bool en, mask_t mask)
   if(!en){
     return;
   }
-  assert(ADDR_START <= addr &&
+  /*assert(ADDR_START <= addr &&
       addr <= ADDR_START + ram_size &&
-      "write data addr out of range");
+      "write data addr out of range");*/
     
   reg_t data_mask = data;
   reg_t full_mask = 0;
@@ -73,7 +81,17 @@ void Ram::DataWrite(reg_t addr, reg_t data, bool en, mask_t mask)
       }
   }
   data_mask = (full_mask & data) | (~full_mask & ram[(addr - ADDR_START) / sizeof(reg_t)]);
-  ram[(addr - ADDR_START) / sizeof(reg_t)] = data_mask;
-  printf("data write addr = 0x%016lx \n", addr);
-  printf("mask = %x, fullMask= 0x%016lx, data = 0x%016lx, data_mask = 0x%016lx\n", mask, full_mask, data, data_mask);
+  if((ADDR_START <= addr) && (addr < ADDR_START + ram_size)){
+    ram[(addr - ADDR_START) / sizeof(reg_t)] = data_mask;
+  }
+  else if((UART0_CTRL_ADDR <= addr) && (addr < UART0_CTRL_ADDR + UART0_CTRL_SIZE)) {
+     uart->write(addr, data);
+  }
+  else{
+    assert(ADDR_START <= addr &&
+      addr <= ADDR_START + ram_size &&
+      "read data addr out of range");
+  }
+  //printf("data write addr = 0x%016lx \n", addr);
+  //printf("mask = %x, fullMask= 0x%016lx, data = 0x%016lx, data_mask = 0x%016lx\n", mask, full_mask, data, data_mask);
 }

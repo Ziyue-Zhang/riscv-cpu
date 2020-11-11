@@ -41,7 +41,7 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
     assert(ref_difftest_init);
 
     ref_difftest_init();
-    ref_isa_reg_display();
+    //ref_isa_reg_display();
 
     ref_difftest_memcpy_from_dut(ADDR_START, ram->get_img_start(), ram->get_img_size());
 
@@ -66,6 +66,9 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
 }
 
 int difftest_step(Emu* emu) {
+    while(1){
+        ref_difftest_exec(1);
+    }
     reg_t reg_dut[33];
     reg_t reg_ref[NUM_REG+7];
     reg_t temp=0;
@@ -74,7 +77,7 @@ int difftest_step(Emu* emu) {
     emu->emu_difftest_getregs(reg_dut);
         
     ref_difftest_getregs(&reg_ref);
-    ref_isa_reg_display();
+    //ref_isa_reg_display();
     bool flag = false;
     for (int i = 0; i < 32; i++) {
         if (reg_dut[i] != reg_ref[i]) {

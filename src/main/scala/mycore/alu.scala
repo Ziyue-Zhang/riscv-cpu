@@ -63,6 +63,7 @@ class alu extends Module{
     (op === ALU_REMU) -> Mux(src2 === 0.U,0.U,(src1 % src2).asUInt())*/
     (use_mdu)           -> mdu.io.mult_out
   ))
-
-  printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res)
+  when(DEBUG){
+    printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res)
+  }
 }
