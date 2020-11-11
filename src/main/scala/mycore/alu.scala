@@ -10,11 +10,28 @@ class alu extends Module{
       val src2 = Input(UInt(XLEN.W))
       val op = Input(UInt(5.W))
       val res =  Output(UInt(XLEN.W))
+
+      val stall = Output(Bool())
   })
+
 
   val op = io.op
   val (src1, src2) = (io.src1, io.src2)
   val shamt = io.src2(5,0).asUInt()  
+
+  // Multiplier
+
+  val use_mdu = op === ALU_MUL    || op === ALU_DIV   || op === ALU_REMW ||
+                op === ALU_REMUW  || op === ALU_DIVUW || op === ALU_MULH ||
+                op === ALU_MULHSU || op === ALU_MULHU || op === ALU_DIVU ||
+                op === ALU_DIVW   || op === ALU_REM   || op === ALU_REMU
+  val mdu = Module(new Multiplier)
+  
+  mdu.io.start := use_mdu
+  mdu.io.a  := io.src1
+  mdu.io.b  := io.src2
+  mdu.io.op    := io.op
+  io.stall     := use_mdu && mdu.io.stall_req
 
   io.res := MuxCase(0.U, Array(
     (op === ALU_ADD)    -> (src1 + src2).asUInt(),
@@ -30,7 +47,7 @@ class alu extends Module{
     (op === ALU_COPY_1) -> src1,
     (op === ALU_COPY_2) -> src2,
     (op === ALU_SRAW)   -> Cat(Fill(32, src1(31)), (src1(31,0).asSInt() >> shamt).asUInt()),
-    (op === ALU_MUL)-> (src1 * src2)(63,0).asUInt(),
+    /*(op === ALU_MUL)-> (src1 * src2)(63,0).asUInt(),
     //(op === ALU_DIV)-> Mux(src2 === 0.U,0.U,(src1.asSInt() / src2.asSInt()).asUInt()),
     (op === ALU_DIV)-> Mux(src2 === 0.U,0.U,(src1 / src2).asUInt()),
     (op === ALU_REMW)-> Mux(src2 === 0.U,0.U,(src1(31,0).asSInt() % src2(31,0).asSInt()).asUInt()),
@@ -43,7 +60,8 @@ class alu extends Module{
     //(op === ALU_DIVW) -> Mux(src2 === 0.U,0.U,(src1(31,0).asSInt() / src2(31,0).asSInt()).asUInt()),
     (op === ALU_DIVW) -> Mux(src2 === 0.U,0.U,(src1(31,0) / src2(31,0)).asUInt()),
     (op === ALU_REM) -> Mux(src2 === 0.U,0.U,(src1.asSInt() % src2.asSInt()).asUInt()),
-    (op === ALU_REMU) -> Mux(src2 === 0.U,0.U,(src1 % src2).asUInt())
+    (op === ALU_REMU) -> Mux(src2 === 0.U,0.U,(src1 % src2).asUInt())*/
+    (use_mdu)           -> mdu.io.mult_out
   ))
 
   printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res)

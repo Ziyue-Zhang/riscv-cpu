@@ -94,8 +94,9 @@ class Dpath extends Module {
   val exe_brjmp_target = Wire(UInt(XLEN.W))
   val exe_jump_reg_target = Wire(UInt(XLEN.W))
   val exception_target    = Wire(UInt(XLEN.W))
+  val alu_stall = Wire(Bool())
 
-  when ((!io.ctl.dec_stall && !io.ctl.full_stall) || io.ctl.pipeline_kill)
+  when ((!io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall) || io.ctl.pipeline_kill)
   {
       if_reg_pc := if_pc_next
   }
@@ -108,7 +109,7 @@ class Dpath extends Module {
                 BUBBLE))) 
 
   when (io.ctl.fencei && io.ctl.exe_pc_sel === PC_4 &&
-         !io.ctl.dec_stall && !io.ctl.full_stall && !io.ctl.pipeline_kill)
+         !io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall && !io.ctl.pipeline_kill)
   {
       if_pc_next := if_reg_pc
   }
@@ -123,7 +124,7 @@ class Dpath extends Module {
       dec_reg_valid := false.B
       dec_reg_inst := BUBBLE
   }
-  .elsewhen (!io.ctl.dec_stall && !io.ctl.full_stall)
+  .elsewhen (!io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall)
   {
       when (io.ctl.if_kill)
       {
@@ -220,7 +221,7 @@ class Dpath extends Module {
   ))
 
 
-  when ((io.ctl.dec_stall && !io.ctl.full_stall) || io.ctl.pipeline_kill)
+  when ((io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall) || io.ctl.pipeline_kill)
   {
       // (kill exe stage)
       // insert NOP (bubble) into Execute stage on front-end stall (e.g., hazard clearing)
@@ -234,7 +235,7 @@ class Dpath extends Module {
       exe_reg_ctrl_csr_cmd  := CSR.N
       exe_reg_ctrl_br_type  := BR_N
   }
-   .elsewhen(!io.ctl.dec_stall)
+   .elsewhen(!io.ctl.dec_stall && !alu_stall)
   {
       // no stalling...
       exe_reg_pc            := dec_reg_pc
@@ -287,6 +288,8 @@ class Dpath extends Module {
   alu.io.op := exe_reg_ctrl_alu_fun 
   alu.io.src1 := exe_alu_op1
   alu.io.src2 := exe_alu_op2
+  alu_stall := alu.io.stall
+  printf("alu_stall = %d\n",alu_stall)
   exe_alu_out := MuxCase(alu.io.res, Array(
       (exe_reg_ctrl_wb_sel === WB_ALUW)-> Cat(Fill(32, alu.io.res(31)), alu.io.res(31,0)),
   ))
@@ -299,7 +302,7 @@ class Dpath extends Module {
 
   val exe_pc_plus4 = (exe_reg_pc + 4.U) (XLEN - 1, 0)
   
-  when (io.ctl.pipeline_kill)
+  when (io.ctl.pipeline_kill || alu_stall)
   {
       mem_reg_valid         := false.B
       mem_reg_inst          := BUBBLE
@@ -343,7 +346,7 @@ class Dpath extends Module {
   csr.io.data_in := mem_reg_alu_out
   csr.io.has_exception := false.B
   csr.io.is_retire := false.B
-  csr.io.has_stall := io.ctl.full_stall
+  csr.io.has_stall := io.ctl.full_stall || alu_stall
   csr.io.in_mem_pc := mem_reg_pc
   csr.io.in_exe_pc := exe_reg_pc
   csr.io.in_dec_pc := dec_reg_pc
