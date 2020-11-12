@@ -3,7 +3,7 @@ VerilatorCppFile = $(shell find ./verilator -name '*.cpp')
 verilog:
 	sbt "runMain sim.elaborate"
 
-verilator: $(VerilatorCppFile) 
+verilator1: $(VerilatorCppFile) 
 	verilator simTop.v \
 	--trace \
 	$(VerilatorCppFile) \
@@ -12,4 +12,4 @@ verilator: $(VerilatorCppFile)
 	make -C obj_dir -f VsimTop.mk
 
 build:
-	make verilator
+	make verilator1

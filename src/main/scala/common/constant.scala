@@ -115,6 +115,7 @@ trait RiscvConstants {
    val ALU_REM    = 23.asUInt(5.W)
    val ALU_REMU   = 24.asUInt(5.W)
    val ALU_MULW   = 25.asUInt(5.W)
+   val ALU_SRLW   = 26.asUInt(5.W)
    val ALU_X      = 0.asUInt(5.W)
 
    // Writeback Select Signal

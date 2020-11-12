@@ -66,9 +66,6 @@ void init_difftest(reg_t *reg, char* imgPath, Ram* ram){
 }
 
 int difftest_step(Emu* emu) {
-    while(1){
-        ref_difftest_exec(1);
-    }
     reg_t reg_dut[33];
     reg_t reg_ref[NUM_REG+7];
     reg_t temp=0;

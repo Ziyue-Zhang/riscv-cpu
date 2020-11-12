@@ -21,10 +21,10 @@ class alu extends Module{
 
   // Multiplier
 
-  val use_mdu = op === ALU_MUL    || op === ALU_DIV   || op === ALU_REMW ||
-                op === ALU_REMUW  || op === ALU_DIVUW || op === ALU_MULH ||
-                op === ALU_MULHSU || op === ALU_MULHU || op === ALU_DIVU ||
-                op === ALU_DIVW   || op === ALU_REM   || op === ALU_REMU
+  val use_mdu = io.op === ALU_MUL    || io.op === ALU_DIV   || io.op === ALU_REMW ||
+                io.op === ALU_REMUW  || io.op === ALU_DIVUW || io.op === ALU_MULH ||
+                io.op === ALU_MULHSU || io.op === ALU_MULHU || io.op === ALU_DIVU ||
+                io.op === ALU_DIVW   || io.op === ALU_REM   || io.op === ALU_REMU
   val mdu = Module(new Multiplier)
   
   mdu.io.start := use_mdu
@@ -43,7 +43,8 @@ class alu extends Module{
     (op === ALU_SLTU)   -> (src1 < src2).asUInt(),
     (op === ALU_SLL)    -> ((src1 << shamt)(XLEN-1, 0)).asUInt(),
     (op === ALU_SRA)    -> (src1.asSInt() >> shamt).asUInt(),
-    (op === ALU_SRL)    -> (src1 >> shamt).asUInt(),
+    (op === ALU_SRL)    -> (src1.asUInt() >> shamt).asUInt(),
+    (op === ALU_SRLW)   -> (src1.asUInt() >> io.src2(4,0).asUInt()).asUInt(),
     (op === ALU_COPY_1) -> src1,
     (op === ALU_COPY_2) -> src2,
     (op === ALU_SRAW)   -> Cat(Fill(32, src1(31)), (src1(31,0).asSInt() >> shamt).asUInt()),
@@ -64,6 +65,6 @@ class alu extends Module{
     (use_mdu)           -> mdu.io.mult_out
   ))
   when(DEBUG){
-    printf("ALU: op = %d, src1=[%x] src2=[%x] result=[%x]\n", op, src1, src2, io.res)
+    printf("ALU: op = %d, src1=[%x] src2=[%x] shamt=[%x] result=[%x]\n", op, src1, src2, shamt,io.res)
   }
 }

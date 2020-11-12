@@ -7,7 +7,7 @@
 #ifndef _VSIMTOP__SYMS_H_
 #define _VSIMTOP__SYMS_H_  // guard
 
-#include "verilated.h"
+#include "verilated_heavy.h"
 
 // INCLUDE MODULE CLASSES
 #include "VsimTop.h"

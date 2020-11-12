@@ -14,8 +14,8 @@ int main(int argc, char** argv){
     Ram* new_ram = new Ram(argv[1]);
     init_difftest(0, NULL,new_ram);
     Emu* emu = new Emu(new_ram, &emu_time);
-    int i=20000;
-    while(i--){
+    int i=200000000;
+    while(1){
         emu->step(1);
     }
 

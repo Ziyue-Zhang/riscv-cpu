@@ -91,7 +91,7 @@ class Cpath extends Module{
                   SUBW   -> List(Y, BR_N  , OP1_RS1 , OP2_RS2  , OEN_1, OEN_1, ALU_SUB , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
                   SLLW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SLL , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
                   SRAW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SRAW, WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
-                  SRLW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SRL , WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
+                  SRLW   -> List(Y, BR_N  , OP1_RS1W, OP2_RS2  , OEN_1, OEN_1, ALU_SRLW, WB_ALUW,REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
 
                   JAL    -> List(Y, BR_J  , OP1_RS1, OP2_UJTYPE, OEN_0, OEN_0, ALU_X   , WB_PC4, REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
                   JALR   -> List(Y, BR_JR , OP1_RS1, OP2_ITYPE , OEN_1, OEN_0, ALU_X   , WB_PC4, REN_1, MEN_0, M_X  , MT_X, MWD_X , csr_x, N),
@@ -251,6 +251,6 @@ class Cpath extends Module{
   io.ctl.csr_cmd := Mux(csr_ren, csr_r, cs_csr_cmd)
 
   when(DEBUG){
-    printf("CTRL : inst = %x, ifkill = %d, deckill = %d, stall = %d\n",io.dat.dec_inst, ifkill, deckill, stall)
+    printf("CTRL : inst = %x, cs_alu_fun = %d, ifkill = %d, deckill = %d, stall = %d\n",io.dat.dec_inst, cs_alu_fun, ifkill, deckill, stall)
   }
 }
