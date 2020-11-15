@@ -2,11 +2,13 @@ package njucore
 
 import chisel3._
 import common._
+import common.constant._
 
 class njucoreIO extends Bundle{
-  val inst_readIO  = new InstReadIO
-  val data_readIO  = new DataReadIO
-  val data_writeIO = new DataWriteIO
+  val imem = new MemPortIO(XLEN)
+  val dmem = new MemPortIO(XLEN)
+  val inst_mmio = Output(UInt(1.W))
+  val data_mmio = Output(UInt(1.W))
 }
 
 class njucore extends Module{
@@ -14,10 +16,15 @@ class njucore extends Module{
   val cpath = Module(new Cpath)
   val dpath = Module(new Dpath)
 
-  io.inst_readIO  <> dpath.io.inst_readIO
-  io.data_readIO  <> dpath.io.data_readIO
-  io.data_writeIO <> dpath.io.data_writeIO
-
   cpath.io.ctl <> dpath.io.ctl
   cpath.io.dat <> dpath.io.dat
+
+  //io.imem  <> cpath.io.imem
+  io.imem  <> dpath.io.imem
+
+  //io.dmem  <> cpath.io.dmem
+  io.dmem  <> dpath.io.dmem
+
+  //io.inst_mmio := dpath.io.inst_mmio
+  io.data_mmio := dpath.io.data_mmio
 }

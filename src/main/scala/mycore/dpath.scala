@@ -13,15 +13,17 @@ class DatToCtlIo extends Bundle() {
   val exe_br_lt = Output(Bool())
   val exe_br_ltu = Output(Bool())
   val exe_br_type = Output(UInt(4.W))
+  val exe_ctrl_dmem_val = Output(Bool())
   val csr_eret = Output(Bool())
 }
 
 class DpathIo extends Bundle() {
   val ctl = Flipped(new CtlToDatIo())
   val dat = new DatToCtlIo()
-  val inst_readIO = new InstReadIO()
-  val data_readIO = new DataReadIO()
-  val data_writeIO = new DataWriteIO()
+  val imem = new MemPortIO(XLEN)
+  val dmem = new MemPortIO(XLEN)
+  val inst_mmio = Output(Bool())
+  val data_mmio = Output(Bool())
 }
 
 class Dpath extends Module {
@@ -87,13 +89,12 @@ class Dpath extends Module {
   val wb_reg_wbdata = Reg(UInt(XLEN.W))
   val wb_reg_ctrl_rf_wen = RegInit(false.B)
 
-
   //********************************************************************************************************************
   // Instruction Fetch Stage
   val if_pc_next = Wire(UInt(XLEN.W)) // next_pc
   val exe_brjmp_target = Wire(UInt(XLEN.W))
   val exe_jump_reg_target = Wire(UInt(XLEN.W))
-  val exception_target    = Wire(UInt(XLEN.W))
+  //val exception_target    = Wire(UInt(XLEN.W))
   val alu_stall = Wire(Bool())
 
   when ((!io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall) || io.ctl.pipeline_kill)
@@ -108,16 +109,29 @@ class Dpath extends Module {
                 Mux(io.ctl.exe_pc_sel === PC_JALR,   exe_jump_reg_target,
                 BUBBLE))) 
 
-  when (io.ctl.fencei && io.ctl.exe_pc_sel === PC_4 &&
+  /*when (io.ctl.fencei && io.ctl.exe_pc_sel === PC_4 &&
          !io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall && !io.ctl.pipeline_kill)
   {
       if_pc_next := if_reg_pc
+  }*/
+
+  io.inst_mmio := (if_reg_pc < 0x80000000L.U)
+
+  val inst_req = RegInit(false.B)  
+  when(io.imem.req.valid && io.imem.req.ready){
+    inst_req := true.B   
+  }.elsewhen(io.imem.resp.valid){
+    inst_req := false.B  
   }
+  
+  //io.imem.req.valid       := !inst_req
+  io.imem.req.valid       := true.B
+  io.imem.req.bits.addr   := if_reg_pc
+  io.imem.req.bits.data   := 0.U
+  io.imem.req.bits.wr     := false.B
+  io.imem.req.bits.msk    := "hFF".U
 
-  io.inst_readIO.addr := if_reg_pc
-  io.inst_readIO.en := true.B
-
-  val if_inst = io.inst_readIO.data
+  val if_inst = Mux(if_reg_pc(2), io.imem.resp.bits.data(63,32), io.imem.resp.bits.data(31,0))  //模8余0或4
   
   when (io.ctl.pipeline_kill)
   {
@@ -139,6 +153,9 @@ class Dpath extends Module {
 
       dec_reg_pc := if_reg_pc
   }
+
+  printf("pc=[%x] inst_mmio=[%d] valid=[%d] inst=[%x]\n",if_reg_pc,io.inst_mmio,io.imem.resp.valid,if_inst)
+  assert(if_reg_pc =/= 0x4000204cL.U)
 
   //DEBUG:
   when(DEBUG){
@@ -343,7 +360,7 @@ class Dpath extends Module {
   
   // Control Status Registers
    // The CSRFile can redirect the PC so it's easiest to put this in Execute for now.
-  val csr = Module(new CSRfile)
+  /*val csr = Module(new CSRfile)
 
   csr.io.inst := mem_reg_inst
   csr.io.csr_op := mem_reg_ctrl_csr_cmd
@@ -357,11 +374,11 @@ class Dpath extends Module {
   csr.io.in_if_pc  := if_reg_pc
 
   io.dat.csr_eret  := csr.io.is_redir
-  exception_target := csr.io.redir_target
+  exception_target := csr.io.redir_target*/
 
-  io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
-  io.data_readIO.addr  := exe_alu_out.asUInt()
-  mem_reg_dram_data    := io.data_readIO.data
+  //io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
+  //io.data_readIO.addr  := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)) 
+  mem_reg_dram_data    := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
   when(DEBUG){
     printf("MEM read data = [%x]\n", mem_reg_dram_data)
   }
@@ -408,6 +425,8 @@ class Dpath extends Module {
   io.dat.exe_br_ltu := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
   io.dat.exe_br_type:= exe_reg_ctrl_br_type
 
+  io.dat.exe_ctrl_dmem_val := exe_reg_ctrl_mem_val
+
   val write_data = MuxCase(exe_reg_rs2_data, Array(
     (exe_reg_ctrl_mem_typ === MT_B)  -> Fill(8, exe_reg_rs2_data( 7,0)),
     (exe_reg_ctrl_mem_typ === MT_H)  -> Fill(4, exe_reg_rs2_data(15,0)),
@@ -417,12 +436,20 @@ class Dpath extends Module {
   val write_mask = Wire(UInt(8.W))
   write_mask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
 
-  io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
-  io.data_writeIO.addr := exe_alu_out.asUInt()   
-  io.data_writeIO.data := write_data     
-  io.data_writeIO.mask := write_mask
+  io.dmem.req.valid     := exe_reg_ctrl_mem_val
+  //io.dmem.req.bits.addr := Mux(exe_alu_out >= "h8000_0000".U, Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)), exe_alu_out)
+  io.dmem.req.bits.addr := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)) 
+  io.dmem.req.bits.data := write_data
+  io.dmem.req.bits.wr   := exe_reg_ctrl_mem_fcn === M_XWR
+  io.dmem.req.bits.msk  := write_mask
+
+  io.data_mmio := (exe_alu_out.asUInt() < 0x80000000L.U) && exe_reg_ctrl_mem_val
+  //io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
+  //io.data_writeIO.addr := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U))   
+  //io.data_writeIO.data := write_data     
+  //io.data_writeIO.mask := write_mask
   when(DEBUG){    
-    printf("store:addr = [%x] en=%d data = [%x] mask = %b\n ", io.data_writeIO.addr, io.data_writeIO.en, io.data_writeIO.data, io.data_writeIO.mask)
+    printf("store:addr = [%x] en=%d data = [%x] mask = %b\n ", io.dmem.req.bits.addr, io.dmem.req.valid, io.dmem.req.bits.data, io.dmem.req.bits.msk)
   }
 
   when(DEBUG){

@@ -5,6 +5,7 @@ import chisel3.util._
 import common.CSR
 import common.constant._
 import common.instructions._
+import common._
 
 class CtlToDatIo extends Bundle(){
   val dec_stall  = Output(Bool())    // stall IF/DEC stages (due to hazards)
@@ -35,7 +36,8 @@ class CtlToDatIo extends Bundle(){
 class CpathIO extends Bundle{
   val dat = Flipped(new DatToCtlIo())
   val ctl = new CtlToDatIo()
-
+  val inst_resp_valid = Input(Bool())
+  val data_resp_valid = Input(Bool())
 }
 
 class Cpath extends Module{
@@ -224,7 +226,12 @@ class Cpath extends Module{
            ((exe_inst_is_load) && (exe_reg_wbaddr === dec_rs2_addr) && (exe_reg_wbaddr =/= 0.U) && dec_rs2_oen) ||
            (exe_reg_is_csr)
 
-  full_stall := false.B
+  val dmem_val  = io.dat.exe_ctrl_dmem_val
+   
+  val inst_stall  = !io.inst_resp_valid
+  val data_stall  = !((dmem_val && io.data_resp_valid) || !dmem_val)
+  
+  full_stall := inst_stall || data_stall
 
   // Set the data-path control signals
   io.ctl.dec_stall  := stall

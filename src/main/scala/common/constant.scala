@@ -7,13 +7,16 @@ object constant extends
     RiscvConstants with 
     MemoryOpConstants with
     CSRConstants with
-    CSRmap{
+    CSRmap with
+    MEMmapConstants with
+    AXIConstants{
 }
 
 trait RiscvConstants {
   val DEBUG   = false.B
 
   val XLEN    = 64
+  val ADDR_ALIGN = log2Ceil(XLEN/8)
   val WIDE    = log2Ceil(XLEN)
   val NUM_REG = 32
 
@@ -36,7 +39,7 @@ trait RiscvConstants {
   val N      = false.B
 
   val MTVEC = 0x100
-  val START_ADDR = "h80000000".U //MTVEC + 0x100
+  val START_ADDR = "h40000000".U 
 
   val PC_4   = 0.asUInt(2.W)  // PC + 4
   val PC_BRJMP  = 1.asUInt(2.W)  // brjmp_target
@@ -313,4 +316,41 @@ trait CSRmap
     val mcounterinhibit = 0x320
     val mhpmevent_start = 0x323
     val mhpmevent_number = 29
+}
+
+trait MEMmapConstants {
+
+  val MMIO_MASK = BigInt("ffffffffc0000000",16)
+  val MMIO_ID   = BigInt("0000000040000000",16)
+
+  val MEM_MASK  = BigInt("ffffffff80000000",16)
+  val MEM_ID    = BigInt("0000000080000000",16)
+}
+
+trait AXIConstants {
+
+  val A_ID_W    = 4
+  val A_ADDR_W  = 32
+  val A_DATA_W  = 64
+  val A_STRB_W  = A_DATA_W/8
+  val A_SIZE_W  = 3
+  val A_BURST_W = 2
+  val A_LEN_W   = 8
+  val A_RESP_W  = 2
+  val A_QOS_W   = 4
+  val A_CACHE_W = 4
+  val A_LOCK_W  = 1
+  val A_PROT_W  = 3
+  val A_USER_W  = 1
+  val A_LAST_W  = 1
+
+  val AXI_ID = 0
+  val AXI_LEN_1 = 0
+  val AXI_SIZE_64bit = 3
+  val AXI_BURST_FIXED = 0
+  val AXI_LOCK_NORMAL = 0
+  val AXI_CACHE_DeviceNonBuffer = 0  //TODO: check
+  val AXI_PROT = 1  //TODO: check
+  val AXI_QOS_NON = 0
+  val AXI_USER = 0
 }

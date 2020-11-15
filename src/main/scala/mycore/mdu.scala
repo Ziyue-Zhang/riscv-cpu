@@ -6,6 +6,8 @@ import chisel3._
 import chisel3.util._
 import common.constant._
 
+//reference to https://github.com/phantom-v/phvntom
+
 trait phvntomParams {
   val xlen          = 64
   val bitWidth      = log2Ceil(xlen)

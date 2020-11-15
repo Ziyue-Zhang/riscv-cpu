@@ -1,7 +1,10 @@
 VerilatorCppFile = $(shell find ./verilator -name '*.cpp')
 
-verilog:
+verilog1:
 	sbt "runMain sim.elaborate"
+
+verilog2:
+	sbt "runMain sim.elaborateysyx_zzy"
 
 verilator1: $(VerilatorCppFile) 
 	verilator simTop.v \
