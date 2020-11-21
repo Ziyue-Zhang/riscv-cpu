@@ -15,6 +15,8 @@ class DatToCtlIo extends Bundle() {
   val exe_br_type = Output(UInt(4.W))
   val exe_ctrl_dmem_val = Output(Bool())
   val csr_eret = Output(Bool())
+  val inst_valid = Output(Bool())
+  val data_valid = Output(Bool())
 }
 
 class DpathIo extends Bundle() {
@@ -26,7 +28,7 @@ class DpathIo extends Bundle() {
   val data_mmio = Output(Bool())
 }
 
-class Dpath extends Module {
+class zzy_Dpath extends Module {
   val io = IO(new DpathIo())
   io := DontCare
 
@@ -35,6 +37,8 @@ class Dpath extends Module {
 
   // Instruction Fetch State
   val if_reg_pc            = RegInit(UInt(XLEN.W), START_ADDR)
+  val inst_valid           = RegInit(false.B)
+  val imm_data             = RegInit(0.asUInt(XLEN.W))
 
   // Instruction Decode State
   val dec_reg_valid        = RegInit(false.B)
@@ -79,21 +83,22 @@ class Dpath extends Module {
   val mem_reg_ctrl_wb_sel  = Reg(UInt())
   val mem_reg_ctrl_mem_wid = RegInit(MWD_X)
   val mem_reg_ctrl_csr_cmd = RegInit(CSR.N)
-  val mem_reg_dram_data    = RegInit(0.asUInt(XLEN.W))
+  val data_valid           = RegInit(false.B)
+  val dmm_data             = RegInit(0.asUInt(XLEN.W))
 
   // Writeback State
-  val wb_reg_valid = RegInit(false.B)
-  val wb_reg_pc = Reg(UInt(XLEN.W))
-  val wb_reg_inst = Reg(UInt(XLEN.W))
-  val wb_reg_wbaddr = Reg(UInt())
-  val wb_reg_wbdata = Reg(UInt(XLEN.W))
-  val wb_reg_ctrl_rf_wen = RegInit(false.B)
+  val wb_reg_valid         = RegInit(false.B)
+  val wb_reg_pc            = Reg(UInt(XLEN.W))
+  val wb_reg_inst          = Reg(UInt(XLEN.W))
+  val wb_reg_wbaddr        = Reg(UInt())
+  val wb_reg_wbdata        = Reg(UInt(XLEN.W))
+  val wb_reg_ctrl_rf_wen   = RegInit(false.B)
 
   //********************************************************************************************************************
   // Instruction Fetch Stage
-  val if_pc_next = Wire(UInt(XLEN.W)) // next_pc
-  val exe_brjmp_target = Wire(UInt(XLEN.W))
-  val exe_jump_reg_target = Wire(UInt(XLEN.W))
+  val if_pc_next           = Wire(UInt(XLEN.W)) // next_pc
+  val exe_brjmp_target     = Wire(UInt(XLEN.W))
+  val exe_jump_reg_target  = Wire(UInt(XLEN.W))
   //val exception_target    = Wire(UInt(XLEN.W))
   val alu_stall = Wire(Bool())
 
@@ -117,21 +122,20 @@ class Dpath extends Module {
 
   io.inst_mmio := (if_reg_pc < 0x80000000L.U)
 
-  val inst_req = RegInit(false.B)  
-  when(io.imem.req.valid && io.imem.req.ready){
-    inst_req := true.B   
-  }.elsewhen(io.imem.resp.valid){
-    inst_req := false.B  
+  when(io.imem.resp.valid === true.B){
+    inst_valid := true.B
+    imm_data  := io.imem.resp.bits.data
   }
-  
-  //io.imem.req.valid       := !inst_req
-  io.imem.req.valid       := true.B
+
+  io.imem.req.valid       := !inst_valid
+  //io.imem.req.valid       := true.B
+  //io.imem.req.bits.addr   :=  Cat(if_reg_pc.asUInt()(XLEN-1, 3), Fill(3, 0.U))
   io.imem.req.bits.addr   := if_reg_pc
   io.imem.req.bits.data   := 0.U
   io.imem.req.bits.wr     := false.B
-  io.imem.req.bits.msk    := "hFF".U
+  io.imem.req.bits.msk    := 2.U
 
-  val if_inst = Mux(if_reg_pc(2), io.imem.resp.bits.data(63,32), io.imem.resp.bits.data(31,0))  //模8余0或4
+  val if_inst = Mux(if_reg_pc(2), imm_data(63,32), imm_data(31,0))  //模8余0或4
   
   when (io.ctl.pipeline_kill)
   {
@@ -150,12 +154,18 @@ class Dpath extends Module {
          dec_reg_valid := true.B
          dec_reg_inst := if_inst
       }
-
+ 
       dec_reg_pc := if_reg_pc
+      inst_valid := false.B
+      imm_data   := 0.U
+      data_valid := false.B
+      //dmm_data   := 0.U
   }
-
-  printf("pc=[%x] inst_mmio=[%d] valid=[%d] inst=[%x]\n",if_reg_pc,io.inst_mmio,io.imem.resp.valid,if_inst)
-  assert(if_reg_pc =/= 0x4000204cL.U)
+  /*when(io.ctl.full_stall===false.B){
+  printf("pc=[%x] data_valid=[%d] inst=[%x] inst_valid=[%x] mem_en=[%d] full_stall=[%d]\n",if_reg_pc,data_valid,if_inst,inst_valid,io.dat.exe_ctrl_dmem_val,io.ctl.full_stall)
+  }
+  assert(if_reg_pc <= 0x400026ccL.U)*/
+  //assert(if_reg_pc =/= 0x40002524L.U || io.dmem.resp.valid === 0.U)
 
   //DEBUG:
   when(DEBUG){
@@ -167,17 +177,18 @@ class Dpath extends Module {
 
   val dec_rs1_addr = dec_reg_inst(19, 15)
   val dec_rs2_addr = dec_reg_inst(24, 20)
-  val dec_wbaddr = dec_reg_inst(11, 7)
+  val dec_wbaddr   = dec_reg_inst(11, 7)
 
 
   // Register File
-  val regfile = Module(new regfile())
+  val regfile = Module(new zzy_regfile())
   regfile.io.rs1_addr := dec_rs1_addr
   regfile.io.rs2_addr := dec_rs2_addr
   val rf_rs1_data = regfile.io.rs1_data
   val rf_rs2_data = regfile.io.rs2_data
   regfile.io.waddr := wb_reg_wbaddr 
   regfile.io.wdata := wb_reg_wbdata
+  //assert(wb_reg_wbdata =/= 0x400026d1L.U)
   regfile.io.wen   := wb_reg_ctrl_rf_wen
 
   // immediates
@@ -217,7 +228,7 @@ class Dpath extends Module {
   dec_rs1_data := MuxCase(rf_rs1_data, Array(
     ((exe_reg_wbaddr === dec_rs1_addr) && (dec_rs1_addr =/= 0.U) && exe_reg_ctrl_rf_wen) -> exe_alu_out,
     ((mem_reg_wbaddr === dec_rs1_addr) && (dec_rs1_addr =/= 0.U) && mem_reg_ctrl_rf_wen) -> mem_wbdata,
-    ((wb_reg_wbaddr === dec_rs1_addr) && (dec_rs1_addr =/= 0.U) && wb_reg_ctrl_rf_wen)   -> wb_reg_wbdata
+    ((wb_reg_wbaddr  === dec_rs1_addr) && (dec_rs1_addr =/= 0.U) && wb_reg_ctrl_rf_wen)  -> wb_reg_wbdata
   )) 
 
   dec_op1_data := MuxCase(dec_rs1_data, Array(
@@ -253,7 +264,7 @@ class Dpath extends Module {
       exe_reg_ctrl_csr_cmd  := CSR.N
       exe_reg_ctrl_br_type  := BR_N
   }
-   .elsewhen(!io.ctl.dec_stall && !alu_stall)
+   .elsewhen(!io.ctl.dec_stall && !io.ctl.full_stall && !alu_stall)
   {
       // no stalling...
       exe_reg_pc            := dec_reg_pc
@@ -303,7 +314,7 @@ class Dpath extends Module {
   val exe_alu_op2 = exe_reg_op2_data.asUInt()
 
   // ALU
-  val alu = Module(new alu)
+  val alu = Module(new zzy_alu)
   alu.io.op := exe_reg_ctrl_alu_fun 
   alu.io.src1 := exe_alu_op1
   alu.io.src2 := exe_alu_op2
@@ -320,7 +331,7 @@ class Dpath extends Module {
 
   val exe_pc_plus4 = (exe_reg_pc + 4.U) (XLEN - 1, 0)
   
-  when (io.ctl.pipeline_kill || alu_stall)
+  when (io.ctl.pipeline_kill)
   {
       mem_reg_valid         := false.B
       mem_reg_inst          := BUBBLE
@@ -328,7 +339,7 @@ class Dpath extends Module {
       mem_reg_ctrl_mem_val  := false.B
       mem_reg_ctrl_csr_cmd  := false.B
   }
-  .elsewhen (!io.ctl.full_stall)
+  .elsewhen (!io.ctl.full_stall && !alu_stall)
   {
       mem_reg_valid         := exe_reg_valid
       mem_reg_pc            := exe_reg_pc
@@ -349,6 +360,7 @@ class Dpath extends Module {
       mem_reg_ctrl_mem_wid  := exe_reg_ctrl_mem_wid
       mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
       mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
+
   }
   
   when(DEBUG){
@@ -377,20 +389,24 @@ class Dpath extends Module {
   exception_target := csr.io.redir_target*/
 
   //io.data_readIO.en    := exe_reg_ctrl_mem_fcn === M_XRD   
-  //io.data_readIO.addr  := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)) 
-  mem_reg_dram_data    := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
+  //io.data_readIO.addr  := Cat(exe_alu_out.asUIntio.dat.inst_valid := inst_valid)(XLEN-1, 3), Fill(3, 0.U)) 
+  //dmm_data := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
+  when(io.dmem.resp.valid === true.B){
+    data_valid := true.B
+    dmm_data   := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
+  }
   when(DEBUG){
-    printf("MEM read data = [%x]\n", mem_reg_dram_data)
+    printf("MEM read data = [%x]\n", dmm_data)
   }
 
-  val mem_data = MuxCase(mem_reg_dram_data, Array(
-    (mem_reg_ctrl_mem_wid === MWD_B ) -> Cat(Fill(56, mem_reg_dram_data( 7)), mem_reg_dram_data(7,0)),
-    (mem_reg_ctrl_mem_wid === MWD_BU) -> Cat(Fill(56, 0.U                  ), mem_reg_dram_data(7,0)),
-    (mem_reg_ctrl_mem_wid === MWD_H ) -> Cat(Fill(48, mem_reg_dram_data(15)), mem_reg_dram_data(15,0)),
-    (mem_reg_ctrl_mem_wid === MWD_HU) -> Cat(Fill(48, 0.U                  ), mem_reg_dram_data(15,0)),
-    (mem_reg_ctrl_mem_wid === MWD_W ) -> Cat(Fill(32, mem_reg_dram_data(31)), mem_reg_dram_data(31,0)),
-    (mem_reg_ctrl_mem_wid === MWD_WU) -> Cat(Fill(32, 0.U                  ), mem_reg_dram_data(31,0)),
-    (mem_reg_ctrl_mem_wid === MWD_D ) ->                                      mem_reg_dram_data
+  val mem_data = MuxCase(dmm_data, Array(
+    (mem_reg_ctrl_mem_wid === MWD_B ) -> Cat(Fill(56, dmm_data( 7)), dmm_data(7,0)),
+    (mem_reg_ctrl_mem_wid === MWD_BU) -> Cat(Fill(56, 0.U         ), dmm_data(7,0)),
+    (mem_reg_ctrl_mem_wid === MWD_H ) -> Cat(Fill(48, dmm_data(15)), dmm_data(15,0)),
+    (mem_reg_ctrl_mem_wid === MWD_HU) -> Cat(Fill(48, 0.U         ), dmm_data(15,0)),
+    (mem_reg_ctrl_mem_wid === MWD_W ) -> Cat(Fill(32, dmm_data(31)), dmm_data(31,0)),
+    (mem_reg_ctrl_mem_wid === MWD_WU) -> Cat(Fill(32, 0.U         ), dmm_data(31,0)),
+    (mem_reg_ctrl_mem_wid === MWD_D ) ->                             dmm_data
   ))
 
   // WB Mux
@@ -404,12 +420,20 @@ class Dpath extends Module {
 
   //********************************************************************************************************************
   // Writeback Stage
-    wb_reg_valid  := mem_reg_valid
-    wb_reg_pc     := mem_reg_pc
-    wb_reg_inst   := mem_reg_inst
-    wb_reg_wbaddr := mem_reg_wbaddr
-    wb_reg_wbdata := mem_wbdata
-    wb_reg_ctrl_rf_wen := mem_reg_ctrl_rf_wen
+  when (!io.ctl.full_stall && !alu_stall)
+  {
+      wb_reg_valid         := mem_reg_valid
+      wb_reg_wbaddr        := mem_reg_wbaddr
+      wb_reg_wbdata        := mem_wbdata
+      wb_reg_pc            := mem_reg_pc
+      wb_reg_inst          := mem_reg_inst
+      wb_reg_ctrl_rf_wen   := mem_reg_ctrl_rf_wen
+  }
+  .otherwise
+  {
+      wb_reg_valid         := false.B
+      wb_reg_ctrl_rf_wen   := false.B
+  }
 
   when(DEBUG){
     printf("WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n", wb_reg_valid, wb_reg_pc, RegNext(mem_reg_inst), wb_reg_wbdata, wb_reg_wbaddr)
@@ -419,13 +443,16 @@ class Dpath extends Module {
   // External Signals
 
   // datapath to controlpath outputs
-  io.dat.dec_inst   := dec_reg_inst 
-  io.dat.exe_br_eq  := (exe_reg_op1_data === exe_reg_rs2_data)
-  io.dat.exe_br_lt  := (exe_reg_op1_data.asSInt() < exe_reg_rs2_data.asSInt())
-  io.dat.exe_br_ltu := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
-  io.dat.exe_br_type:= exe_reg_ctrl_br_type
+  io.dat.dec_inst    := dec_reg_inst 
+  io.dat.exe_br_eq   := (exe_reg_op1_data === exe_reg_rs2_data)
+  io.dat.exe_br_lt   := (exe_reg_op1_data.asSInt() < exe_reg_rs2_data.asSInt())
+  io.dat.exe_br_ltu  := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
+  io.dat.exe_br_type := exe_reg_ctrl_br_type
 
-  io.dat.exe_ctrl_dmem_val := exe_reg_ctrl_mem_val
+  io.dat.exe_ctrl_dmem_val := exe_reg_ctrl_mem_val && exe_reg_valid
+
+  io.dat.inst_valid := inst_valid
+  io.dat.data_valid := data_valid
 
   val write_data = MuxCase(exe_reg_rs2_data, Array(
     (exe_reg_ctrl_mem_typ === MT_B)  -> Fill(8, exe_reg_rs2_data( 7,0)),
@@ -436,14 +463,23 @@ class Dpath extends Module {
   val write_mask = Wire(UInt(8.W))
   write_mask := (exe_reg_ctrl_mem_typ << exe_alu_out(2,0))(7,0)      //exe_alu_out为写地址
 
-  io.dmem.req.valid     := exe_reg_ctrl_mem_val
+  io.data_mmio := (exe_alu_out.asUInt() < 0x80000000L.U)
+
+  io.dmem.req.valid     := exe_reg_ctrl_mem_val && !data_valid && exe_reg_valid && inst_valid
+  //printf("is_mmio=[%d], dmem_req=[%d]\n",io.data_mmio,exe_reg_ctrl_mem_val && !data_valid && exe_reg_valid && inst_valid)
   //io.dmem.req.bits.addr := Mux(exe_alu_out >= "h8000_0000".U, Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)), exe_alu_out)
-  io.dmem.req.bits.addr := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)) 
+  //io.dmem.req.bits.addr := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)) 
+  io.dmem.req.bits.addr := exe_alu_out.asUInt()
   io.dmem.req.bits.data := write_data
   io.dmem.req.bits.wr   := exe_reg_ctrl_mem_fcn === M_XWR
-  io.dmem.req.bits.msk  := write_mask
+  io.dmem.req.bits.msk  := MuxCase(3.U, Array(
+    (exe_reg_ctrl_mem_typ === MT_B)  -> 0.U,
+    (exe_reg_ctrl_mem_typ === MT_H)  -> 1.U,
+    (exe_reg_ctrl_mem_typ === MT_W)  -> 2.U,
+    (exe_reg_ctrl_mem_typ === MT_D)  -> 3.U,
+  ))
 
-  io.data_mmio := (exe_alu_out.asUInt() < 0x80000000L.U) && exe_reg_ctrl_mem_val
+  //io.data_mmio := (exe_alu_out.asUInt() < 0x80000000L.U) && exe_reg_ctrl_mem_val
   //io.data_writeIO.en   := exe_reg_ctrl_mem_fcn === M_XWR   
   //io.data_writeIO.addr := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U))   
   //io.data_writeIO.data := write_data     

@@ -17,7 +17,7 @@ class regfileIo() extends Bundle()
    val wdata    = Input(UInt(XLEN.W))
    val wen      = Input(UInt(1.W))
 }
-class regfile extends Module{
+class zzy_regfile extends Module{
   val io = IO(new regfileIo()) 
   val regfile = Mem(32, UInt(XLEN.W))
 

@@ -1,4 +1,4 @@
-package sim
+/*package sim
 
 import chisel3._
 import chisel3.util._
@@ -22,4 +22,4 @@ class simTop extends Module{
 
 object elaborate extends App {
   (new stage.ChiselStage).execute(args, Seq(stage.ChiselGeneratorAnnotation(() => new simTop)))
-}
+}*/

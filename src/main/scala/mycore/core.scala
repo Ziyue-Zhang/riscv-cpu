@@ -1,4 +1,4 @@
-package njucore
+/*package njucore
 
 import chisel3._
 import common._
@@ -27,4 +27,4 @@ class njucore extends Module{
 
   //io.inst_mmio := dpath.io.inst_mmio
   io.data_mmio := dpath.io.data_mmio
-}
+}*/

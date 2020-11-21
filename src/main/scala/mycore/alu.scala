@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import common.constant._
 
-class alu extends Module{
+class zzy_alu extends Module{
   val io = IO(new Bundle {
       val src1 = Input(UInt(XLEN.W))
       val src2 = Input(UInt(XLEN.W))
@@ -25,7 +25,7 @@ class alu extends Module{
                 io.op === ALU_REMUW  || io.op === ALU_DIVUW || io.op === ALU_MULH ||
                 io.op === ALU_MULHSU || io.op === ALU_MULHU || io.op === ALU_DIVU ||
                 io.op === ALU_DIVW   || io.op === ALU_REM   || io.op === ALU_REMU
-  val mdu = Module(new Multiplier)
+  val mdu = Module(new zzy_Multiplier)
   
   mdu.io.start := use_mdu
   mdu.io.a  := io.src1

@@ -36,11 +36,9 @@ class CtlToDatIo extends Bundle(){
 class CpathIO extends Bundle{
   val dat = Flipped(new DatToCtlIo())
   val ctl = new CtlToDatIo()
-  val inst_resp_valid = Input(Bool())
-  val data_resp_valid = Input(Bool())
 }
 
-class Cpath extends Module{
+class zzy_Cpath extends Module{
   val io = IO(new CpathIO())
   io := DontCare
 
@@ -156,7 +154,7 @@ class Cpath extends Module{
   val ifkill  = (ctrl_exe_pc_sel =/= PC_4) || cs_fencei || RegNext(cs_fencei) 
   val deckill = (ctrl_exe_pc_sel =/= PC_4)
 
-  io.ctl.pipeline_kill := io.dat.csr_eret
+  io.ctl.pipeline_kill := false.B
 
   val dec_exception = (!cs_val_inst)
 
@@ -228,8 +226,8 @@ class Cpath extends Module{
 
   val dmem_val  = io.dat.exe_ctrl_dmem_val
    
-  val inst_stall  = !io.inst_resp_valid
-  val data_stall  = !((dmem_val && io.data_resp_valid) || !dmem_val)
+  val inst_stall  = !io.dat.inst_valid
+  val data_stall  = !((dmem_val && io.dat.data_valid) || !dmem_val)
   
   full_stall := inst_stall || data_stall
 

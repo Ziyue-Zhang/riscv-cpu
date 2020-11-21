@@ -1,1 +1,1 @@
-/home/zzy/Desktop/riscv/AXI_Bridge.v
+/home/zzy/Desktop/riscv/zzy_AXI_Bridge.v

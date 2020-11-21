@@ -6,9 +6,9 @@ import chisel3.experimental.ChiselEnum
 
 import common.constant._
 
-class AXI_Interface extends Bundle {
+class zzy_AXI_Interface extends Bundle {
     private val data_width = 64
-    private val addr_width = 64
+    private val addr_width = 32
     private val wstrb_width = data_width/8
     private val id_width = 8
 
@@ -22,6 +22,8 @@ class AXI_Interface extends Bundle {
     val awprot  = Input(UInt(3.W))
     val awvalid = Input(Bool())
     val awready = Output(Bool())
+    val awqos   = Output(UInt(A_QOS_W.W))
+    val awuser  = Output(Bool())
 
     val wid     = Input(UInt(id_width.W))
     val wdata   = Input(UInt(data_width.W))
@@ -34,6 +36,8 @@ class AXI_Interface extends Bundle {
     val bresp   = Output(UInt(2.W))
     val bvalid  = Output(Bool())
     val bready  = Input(Bool())
+    //val buser   = Input(Bool())
+
     val arid    = Input(UInt(id_width.W))
     val araddr  = Input(UInt(addr_width.W))
     val arlen   = Input(UInt(8.W))
@@ -44,6 +48,8 @@ class AXI_Interface extends Bundle {
     val arprot  = Input(UInt(3.W))
     val arvalid = Input(Bool())
     val arready = Output(Bool())
+    val aruser  = Output(Bool())
+    val arqos   = Output(UInt(A_QOS_W.W)) 
 
     val rid     = Output(UInt(id_width.W))
     val rdata   = Output(UInt(data_width.W))
@@ -51,17 +57,19 @@ class AXI_Interface extends Bundle {
     val rlast   = Output(Bool())
     val rvalid  = Output(Bool())
     val rready  = Input(Bool())
+    //val ruser   = Input(Bool())
 }
 
-class AXI_lite_interface extends Bundle {
+class zzy_AXI_lite_interface extends Bundle {
     private val data_width = 64
-    private val addr_width = 64 // 1 Megabyte should be enough for us
+    private val addr_width = 32 // 1 Megabyte should be enough for us
     private val wstrb_width = data_width / 8
 
     val awaddr  = Input(UInt(addr_width.W))
     val awprot  = Input(UInt(3.W))
     val awvalid = Input(Bool())
     val awready = Output(Bool())
+    val awsize  = Input(UInt(3.W))
 
     val wdata   = Input(UInt(data_width.W))
     val wstrb   = Input(UInt(wstrb_width.W))
@@ -76,6 +84,7 @@ class AXI_lite_interface extends Bundle {
     val arprot  = Input(UInt(3.W))
     val arvalid = Input(Bool())
     val arready = Output(Bool())
+    val arsize  = Input(UInt(3.W))
 
     val rdata   = Output(UInt(data_width.W))
     val rresp   = Output(UInt(2.W))
@@ -83,8 +92,8 @@ class AXI_lite_interface extends Bundle {
     val rready  = Input(Bool())
 }
 
-class AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
-    val io = IO(Flipped(new AXI_Interface {
+class zzy_AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
+    val io = IO(Flipped(new zzy_AXI_Interface {
         val clock = Output(Clock())
         val reset = Output(Reset())
         // CPU side
@@ -110,9 +119,9 @@ class AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
         
         // AXI side is automatically included in AXI_interface
     }))
-    setInline("AXI_Bridge.v",
+    setInline("zzy_AXI_Bridge.v",
         s"""
-           module AXI_Bridge
+           module zzy_AXI_Bridge
            (
                input         clock,
                input         reset,
@@ -144,11 +153,13 @@ class AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
                output [7 :0] arlen        ,
                output [2 :0] arsize       ,
                output [1 :0] arburst      ,
-               output [1 :0] arlock        ,
+               output [1 :0] arlock       ,
                output [3 :0] arcache      ,
                output [2 :0] arprot       ,
                output        arvalid      ,
                input         arready      ,
+               input  [3 :0] arqos        ,
+               input         aruser       ,
                //r
                input  [3 :0] rid          ,
                input  [63:0] rdata        ,
@@ -156,6 +167,7 @@ class AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
                input         rlast        ,
                input         rvalid       ,
                output        rready       ,
+               //input         ruser        ,
                //aw
                output [3 :0] awid         ,
                output [63:0] awaddr       ,
@@ -167,6 +179,9 @@ class AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
                output [2 :0] awprot       ,
                output        awvalid      ,
                input         awready      ,
+               input  [3 :0] awqos        ,
+               input         awuser       ,
+
                //w
                output [3 :0] wid          ,
                output [63:0] wdata        ,
@@ -178,7 +193,8 @@ class AXI_Bridge(width: Int = 64) extends BlackBox with HasBlackBoxInline {
                input  [3 :0] bid          ,
                input  [1 :0] bresp        ,
                input         bvalid       ,
-               output        bready
+               output        bready       
+               //input         buser
            );
 wire resetn = !reset;
 //addr

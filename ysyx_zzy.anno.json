@@ -1,145 +1,145 @@
 [
   {
     "class":"firrtl.transforms.BlackBoxInlineAnno",
-    "target":"ysyx_zzy.AXI_Bridge",
-    "name":"AXI_Bridge.v",
-    "text":"\n           module AXI_Bridge\n           (\n               input         clock,\n               input         reset,\n           \n               //inst sram-like\n               input         inst_req     ,\n               input         inst_wr      ,\n               input  [1 :0] inst_size    ,\n               input  [63:0] inst_addr    ,\n               input  [63:0] inst_wdata   ,\n               output [63:0] inst_rdata   ,\n               output        inst_addr_ok ,\n               output        inst_data_ok ,\n           \n               //data sram-like\n               input         data_req     ,\n               input         data_wr      ,\n               input  [1 :0] data_size    ,\n               input  [63:0] data_addr    ,\n               input  [63:0] data_wdata   ,\n               output [63:0] data_rdata   ,\n               output        data_addr_ok ,\n               output        data_data_ok ,\n           \n               //axi\n               //ar\n               output [3 :0] arid         ,\n               output [63:0] araddr       ,\n               output [7 :0] arlen        ,\n               output [2 :0] arsize       ,\n               output [1 :0] arburst      ,\n               output [1 :0] arlock        ,\n               output [3 :0] arcache      ,\n               output [2 :0] arprot       ,\n               output        arvalid      ,\n               input         arready      ,\n               //r\n               input  [3 :0] rid          ,\n               input  [63:0] rdata        ,\n               input  [1 :0] rresp        ,\n               input         rlast        ,\n               input         rvalid       ,\n               output        rready       ,\n               //aw\n               output [3 :0] awid         ,\n               output [63:0] awaddr       ,\n               output [7 :0] awlen        ,\n               output [2 :0] awsize       ,\n               output [1 :0] awburst      ,\n               output [1 :0] awlock       ,\n               output [3 :0] awcache      ,\n               output [2 :0] awprot       ,\n               output        awvalid      ,\n               input         awready      ,\n               //w\n               output [3 :0] wid          ,\n               output [63:0] wdata        ,\n               output [7 :0] wstrb        ,\n               output        wlast        ,\n               output        wvalid       ,\n               input         wready       ,\n               //b\n               input  [3 :0] bid          ,\n               input  [1 :0] bresp        ,\n               input         bvalid       ,\n               output        bready\n           );\nwire resetn = !reset;\n//addr\nreg do_req;\nreg do_req_or; //req is inst or data;1:data,0:inst\nreg        do_wr_r;\nreg [1 :0] do_size_r;\nreg [63:0] do_addr_r;\nreg [63:0] do_wdata_r;\nwire data_back;\n\nassign inst_addr_ok = !do_req&&!data_req;\nassign data_addr_ok = !do_req;\nalways @(posedge clock)\nbegin\n    do_req     <= !resetn                       ? 1'b0 :\n                  (inst_req||data_req)&&!do_req ? 1'b1 :\n                  data_back                     ? 1'b0 : do_req;\n    do_req_or  <= !resetn ? 1'b0 :\n                  !do_req ? data_req : do_req_or;\n\n    do_wr_r    <= data_req&&data_addr_ok ? data_wr :\n                  inst_req&&inst_addr_ok ? inst_wr : do_wr_r;\n    do_size_r  <= data_req&&data_addr_ok ? data_size :\n                  inst_req&&inst_addr_ok ? inst_size : do_size_r;\n    do_addr_r  <= data_req&&data_addr_ok ? data_addr :\n                  inst_req&&inst_addr_ok ? inst_addr : do_addr_r;\n    do_wdata_r <= data_req&&data_addr_ok ? data_wdata :\n                  inst_req&&inst_addr_ok ? inst_wdata :do_wdata_r;\nend\n\n//inst sram-like\nassign inst_data_ok = do_req&&!do_req_or&&data_back;\nassign data_data_ok = do_req&& do_req_or&&data_back;\nassign inst_rdata   = rdata;\nassign data_rdata   = rdata;\n\n//---axi\nreg addr_rcv;\nreg wdata_rcv;\n\nassign data_back = addr_rcv && (rvalid&&rready||bvalid&&bready);\nalways @(posedge clock)\nbegin\n    addr_rcv  <= !resetn          ? 1'b0 :\n                 arvalid&&arready ? 1'b1 :\n                 awvalid&&awready ? 1'b1 :\n                 data_back        ? 1'b0 : addr_rcv;\n    wdata_rcv <= !resetn        ? 1'b0 :\n                 wvalid&&wready ? 1'b1 :\n                 data_back      ? 1'b0 : wdata_rcv;\nend\n//ar\nassign arid    = 4'd0;\nassign araddr  = do_addr_r;\nassign arlen   = 8'd0;\nassign arsize  = do_size_r;\nassign arburst = 2'd0;\nassign arlock  = 2'd0;\nassign arcache = 4'd0;\nassign arprot  = 3'd0;\nassign arvalid = do_req&&!do_wr_r&&!addr_rcv;\n//r\nassign rready  = 1'b1;\n\n//aw\nassign awid    = 4'd0;\nassign awaddr  = do_addr_r;\nassign awlen   = 8'd0;\nassign awsize  = do_size_r;\nassign awburst = 2'd0;\nassign awlock  = 2'd0;\nassign awcache = 4'd0;\nassign awprot  = 3'd0;\nassign awvalid = do_req&&do_wr_r&&!addr_rcv;\n//w\nassign wid    = 4'd0;\nassign wdata  = do_wdata_r;\nassign wstrb  = do_size_r==2'd0 ? 8'b00000001<<do_addr_r[2:0] :\n                do_size_r==2'd1 ? 8'b00000011<<do_addr_r[2:0] :\n                do_size_r==2'd2 ? 8'b00001111<<do_addr_r[2:0] : 8'b11111111;\nassign wlast  = 1'd1;\nassign wvalid = do_req&&do_wr_r&&!wdata_rcv;\n//b\nassign bready  = 1'b1;\n\nendmodule\n\n\n           \n    "
+    "target":"ysyx_zzy.zzy_AXI_Bridge",
+    "name":"zzy_AXI_Bridge.v",
+    "text":"\n           module zzy_AXI_Bridge\n           (\n               input         clock,\n               input         reset,\n           \n               //inst sram-like\n               input         inst_req     ,\n               input         inst_wr      ,\n               input  [1 :0] inst_size    ,\n               input  [63:0] inst_addr    ,\n               input  [63:0] inst_wdata   ,\n               output [63:0] inst_rdata   ,\n               output        inst_addr_ok ,\n               output        inst_data_ok ,\n           \n               //data sram-like\n               input         data_req     ,\n               input         data_wr      ,\n               input  [1 :0] data_size    ,\n               input  [63:0] data_addr    ,\n               input  [63:0] data_wdata   ,\n               output [63:0] data_rdata   ,\n               output        data_addr_ok ,\n               output        data_data_ok ,\n           \n               //axi\n               //ar\n               output [3 :0] arid         ,\n               output [63:0] araddr       ,\n               output [7 :0] arlen        ,\n               output [2 :0] arsize       ,\n               output [1 :0] arburst      ,\n               output [1 :0] arlock       ,\n               output [3 :0] arcache      ,\n               output [2 :0] arprot       ,\n               output        arvalid      ,\n               input         arready      ,\n               input  [3 :0] arqos        ,\n               input         aruser       ,\n               //r\n               input  [3 :0] rid          ,\n               input  [63:0] rdata        ,\n               input  [1 :0] rresp        ,\n               input         rlast        ,\n               input         rvalid       ,\n               output        rready       ,\n               //input         ruser        ,\n               //aw\n               output [3 :0] awid         ,\n               output [63:0] awaddr       ,\n               output [7 :0] awlen        ,\n               output [2 :0] awsize       ,\n               output [1 :0] awburst      ,\n               output [1 :0] awlock       ,\n               output [3 :0] awcache      ,\n               output [2 :0] awprot       ,\n               output        awvalid      ,\n               input         awready      ,\n               input  [3 :0] awqos        ,\n               input         awuser       ,\n\n               //w\n               output [3 :0] wid          ,\n               output [63:0] wdata        ,\n               output [7 :0] wstrb        ,\n               output        wlast        ,\n               output        wvalid       ,\n               input         wready       ,\n               //b\n               input  [3 :0] bid          ,\n               input  [1 :0] bresp        ,\n               input         bvalid       ,\n               output        bready       \n               //input         buser\n           );\nwire resetn = !reset;\n//addr\nreg do_req;\nreg do_req_or; //req is inst or data;1:data,0:inst\nreg        do_wr_r;\nreg [1 :0] do_size_r;\nreg [63:0] do_addr_r;\nreg [63:0] do_wdata_r;\nwire data_back;\n\nassign inst_addr_ok = !do_req&&!data_req;\nassign data_addr_ok = !do_req;\nalways @(posedge clock)\nbegin\n    do_req     <= !resetn                       ? 1'b0 :\n                  (inst_req||data_req)&&!do_req ? 1'b1 :\n                  data_back                     ? 1'b0 : do_req;\n    do_req_or  <= !resetn ? 1'b0 :\n                  !do_req ? data_req : do_req_or;\n\n    do_wr_r    <= data_req&&data_addr_ok ? data_wr :\n                  inst_req&&inst_addr_ok ? inst_wr : do_wr_r;\n    do_size_r  <= data_req&&data_addr_ok ? data_size :\n                  inst_req&&inst_addr_ok ? inst_size : do_size_r;\n    do_addr_r  <= data_req&&data_addr_ok ? data_addr :\n                  inst_req&&inst_addr_ok ? inst_addr : do_addr_r;\n    do_wdata_r <= data_req&&data_addr_ok ? data_wdata :\n                  inst_req&&inst_addr_ok ? inst_wdata :do_wdata_r;\nend\n\n//inst sram-like\nassign inst_data_ok = do_req&&!do_req_or&&data_back;\nassign data_data_ok = do_req&& do_req_or&&data_back;\nassign inst_rdata   = rdata;\nassign data_rdata   = rdata;\n\n//---axi\nreg addr_rcv;\nreg wdata_rcv;\n\nassign data_back = addr_rcv && (rvalid&&rready||bvalid&&bready);\nalways @(posedge clock)\nbegin\n    addr_rcv  <= !resetn          ? 1'b0 :\n                 arvalid&&arready ? 1'b1 :\n                 awvalid&&awready ? 1'b1 :\n                 data_back        ? 1'b0 : addr_rcv;\n    wdata_rcv <= !resetn        ? 1'b0 :\n                 wvalid&&wready ? 1'b1 :\n                 data_back      ? 1'b0 : wdata_rcv;\nend\n//ar\nassign arid    = 4'd0;\nassign araddr  = do_addr_r;\nassign arlen   = 8'd0;\nassign arsize  = do_size_r;\nassign arburst = 2'd0;\nassign arlock  = 2'd0;\nassign arcache = 4'd0;\nassign arprot  = 3'd0;\nassign arvalid = do_req&&!do_wr_r&&!addr_rcv;\n//r\nassign rready  = 1'b1;\n\n//aw\nassign awid    = 4'd0;\nassign awaddr  = do_addr_r;\nassign awlen   = 8'd0;\nassign awsize  = do_size_r;\nassign awburst = 2'd0;\nassign awlock  = 2'd0;\nassign awcache = 4'd0;\nassign awprot  = 3'd0;\nassign awvalid = do_req&&do_wr_r&&!addr_rcv;\n//w\nassign wid    = 4'd0;\nassign wdata  = do_wdata_r;\nassign wstrb  = do_size_r==2'd0 ? 8'b00000001<<do_addr_r[2:0] :\n                do_size_r==2'd1 ? 8'b00000011<<do_addr_r[2:0] :\n                do_size_r==2'd2 ? 8'b00001111<<do_addr_r[2:0] : 8'b11111111;\nassign wlast  = 1'd1;\nassign wvalid = do_req&&do_wr_r&&!wdata_rcv;\n//b\nassign bready  = 1'b1;\n\nendmodule\n\n\n           \n    "
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|Dpath>wb_reg_valid"
+    "target":"~ysyx_zzy|zzy_Dpath>wb_reg_valid"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|Dpath>wb_reg_pc"
+    "target":"~ysyx_zzy|zzy_Dpath>wb_reg_pc"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_0"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_0"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_1"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_1"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_2"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_2"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_3"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_3"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_4"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_4"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_5"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_5"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_6"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_6"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_7"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_7"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_8"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_8"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_9"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_9"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_10"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_10"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_11"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_11"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_12"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_12"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_13"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_13"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_14"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_14"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_15"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_15"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_16"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_16"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_17"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_17"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_18"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_18"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_19"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_19"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_20"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_20"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_21"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_21"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_22"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_22"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_23"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_23"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_24"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_24"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_25"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_25"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_26"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_26"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_27"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_27"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_28"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_28"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_29"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_29"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_30"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_30"
   },
   {
     "class":"firrtl.transforms.DontTouchAnnotation",
-    "target":"~ysyx_zzy|regfile>_T_42_31"
+    "target":"~ysyx_zzy|zzy_regfile>_T_42_31"
   },
   {
     "class":"firrtl.options.TargetDirAnnotation",

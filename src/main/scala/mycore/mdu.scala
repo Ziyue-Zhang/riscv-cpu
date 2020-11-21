@@ -16,7 +16,7 @@ trait phvntomParams {
   val aluBits       = aluXXX.getWidth  
 }
 
-class MultiplierIO extends Bundle with phvntomParams {
+class zzy_MultiplierIO extends Bundle with phvntomParams {
   val start = Input(Bool())
   val a = Input(UInt(xlen.W))
   val b = Input(UInt(xlen.W))
@@ -25,7 +25,7 @@ class MultiplierIO extends Bundle with phvntomParams {
   val mult_out = Output(UInt(xlen.W))
 }
 
-class Multiplier extends Module with phvntomParams {
+class zzy_Multiplier extends Module with phvntomParams {
   val io = IO(new Bundle{
     val start = Input(Bool())
     val a = Input(UInt(xlen.W))
