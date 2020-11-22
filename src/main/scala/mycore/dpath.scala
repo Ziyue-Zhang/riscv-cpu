@@ -84,6 +84,7 @@ class zzy_Dpath extends Module {
   val mem_reg_ctrl_mem_wid = RegInit(MWD_X)
   val mem_reg_ctrl_csr_cmd = RegInit(CSR.N)
   val data_valid           = RegInit(false.B)
+  val dmm_data_cache       = RegInit(0.asUInt(XLEN.W))
   val dmm_data             = RegInit(0.asUInt(XLEN.W))
 
   // Writeback State
@@ -161,13 +162,12 @@ class zzy_Dpath extends Module {
       data_valid := false.B
       //dmm_data   := 0.U
   }
-  /*when(io.ctl.full_stall===false.B){
+  when(DEBUG){
   printf("pc=[%x] data_valid=[%d] inst=[%x] inst_valid=[%x] mem_en=[%d] full_stall=[%d]\n",if_reg_pc,data_valid,if_inst,inst_valid,io.dat.exe_ctrl_dmem_val,io.ctl.full_stall)
   }
-  assert(if_reg_pc <= 0x400026ccL.U)*/
+  //assert(if_reg_pc =/= 0x400026d1L.U)
   //assert(if_reg_pc =/= 0x40002524L.U || io.dmem.resp.valid === 0.U)
 
-  //DEBUG:
   when(DEBUG){
     printf("IF : pc=[%x] inst=[%x] if_pc_next=[%x] pc_sel=[%d] e_bj_pc=[%x]\n", if_reg_pc, if_inst, if_pc_next, io.ctl.exe_pc_sel, exe_brjmp_target)
   }
@@ -305,6 +305,7 @@ class zzy_Dpath extends Module {
    }
 
   when(DEBUG){
+    printf("REG: wb_addr = %x, wb_data = %x, wen = %d\n",wb_reg_wbaddr, wb_reg_wbdata, wb_reg_ctrl_rf_wen)
     printf("DEC: valid = %d pc=[%x] inst=[%x] op1=[%x] alu2=[%x] op2=[%x]\n", dec_reg_valid, dec_reg_pc, dec_reg_inst, dec_op1_data, dec_alu_op2, dec_op2_data)
   }
 
@@ -360,10 +361,12 @@ class zzy_Dpath extends Module {
       mem_reg_ctrl_mem_wid  := exe_reg_ctrl_mem_wid
       mem_reg_ctrl_wb_sel   := exe_reg_ctrl_wb_sel
       mem_reg_ctrl_csr_cmd  := exe_reg_ctrl_csr_cmd
-
+      
+      dmm_data              := dmm_data_cache
   }
   
   when(DEBUG){
+    printf("ALU: op1 = %x, op2 = %x, res = %x\n",exe_alu_op1, exe_alu_op2, exe_alu_out)
     printf("EXE: valid = %d pc=[%x] inst=[%x] bj_target = [%x]\n", exe_reg_valid, exe_reg_pc, exe_reg_inst, exe_brjmp_target)
   }
 
@@ -392,8 +395,8 @@ class zzy_Dpath extends Module {
   //io.data_readIO.addr  := Cat(exe_alu_out.asUIntio.dat.inst_valid := inst_valid)(XLEN-1, 3), Fill(3, 0.U)) 
   //dmm_data := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
   when(io.dmem.resp.valid === true.B){
-    data_valid := true.B
-    dmm_data   := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
+    data_valid     := true.B
+    dmm_data_cache := io.dmem.resp.bits.data >> (exe_alu_out(2,0) << 3.U)
   }
   when(DEBUG){
     printf("MEM read data = [%x]\n", dmm_data)
@@ -432,11 +435,11 @@ class zzy_Dpath extends Module {
   .otherwise
   {
       wb_reg_valid         := false.B
-      wb_reg_ctrl_rf_wen   := false.B
+      //wb_reg_ctrl_rf_wen   := false.B
   }
 
   when(DEBUG){
-    printf("WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n", wb_reg_valid, wb_reg_pc, RegNext(mem_reg_inst), wb_reg_wbdata, wb_reg_wbaddr)
+    printf("WB : valid = %d pc=[%x] inst=[%x], mem_wbdata=[%x], mem_reg_wbaddr=[%d]\n", wb_reg_valid, wb_reg_pc, wb_reg_inst, wb_reg_wbdata, wb_reg_wbaddr)
   }
 
   //********************************************************************************************************************
@@ -449,7 +452,7 @@ class zzy_Dpath extends Module {
   io.dat.exe_br_ltu  := (exe_reg_op1_data.asUInt() < exe_reg_rs2_data.asUInt())
   io.dat.exe_br_type := exe_reg_ctrl_br_type
 
-  io.dat.exe_ctrl_dmem_val := exe_reg_ctrl_mem_val && exe_reg_valid
+  io.dat.exe_ctrl_dmem_val := exe_reg_ctrl_mem_val
 
   io.dat.inst_valid := inst_valid
   io.dat.data_valid := data_valid
@@ -465,7 +468,7 @@ class zzy_Dpath extends Module {
 
   io.data_mmio := (exe_alu_out.asUInt() < 0x80000000L.U)
 
-  io.dmem.req.valid     := exe_reg_ctrl_mem_val && !data_valid && exe_reg_valid && inst_valid
+  io.dmem.req.valid     := exe_reg_ctrl_mem_val && !data_valid && inst_valid
   //printf("is_mmio=[%d], dmem_req=[%d]\n",io.data_mmio,exe_reg_ctrl_mem_val && !data_valid && exe_reg_valid && inst_valid)
   //io.dmem.req.bits.addr := Mux(exe_alu_out >= "h8000_0000".U, Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)), exe_alu_out)
   //io.dmem.req.bits.addr := Cat(exe_alu_out.asUInt()(XLEN-1, 3), Fill(3, 0.U)) 
@@ -489,7 +492,7 @@ class zzy_Dpath extends Module {
   }
 
   when(DEBUG){
-    printf("pc=[%x]\n", wb_reg_pc)
+    printf("pc=[%x]\n\n", wb_reg_pc)
   }
 
   BoringUtils.addSource(wb_reg_pc, "diffTestPC")
